@@ -6,7 +6,7 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.UUID;
+
 
 @Entity
 @Table(name = "notas_evaluacion", uniqueConstraints = {
@@ -18,9 +18,9 @@ import java.util.UUID;
 public class NotaEvaluacion {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_nota", updatable = false, nullable = false)
-    private UUID idNota;
+    private Long idNota;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "evaluacion_id", nullable = false)

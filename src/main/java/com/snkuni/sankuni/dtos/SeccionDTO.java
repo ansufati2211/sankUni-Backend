@@ -3,12 +3,12 @@ package com.snkuni.sankuni.dtos;
 import lombok.Builder;
 import lombok.Data;
 import java.time.LocalTime;
-import java.util.UUID;
+
 
 @Data
 @Builder
 public class SeccionDTO {
-    private UUID idSeccion;
+    private Long idSeccion;
     private String nombreCurso;
     private String nombreDocente;
     private String cicloAcademico;

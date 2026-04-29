@@ -11,9 +11,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.UUID;
+
 import java.util.stream.Collectors;
 
+@SuppressWarnings("unused")
 @Service
 @RequiredArgsConstructor
 public class EvaluacionService {
@@ -39,7 +40,7 @@ public class EvaluacionService {
     }
 
     @Transactional(readOnly = true)
-    public List<EvaluacionDTO> listarPorSeccion(UUID idSeccion) {
+    public List<EvaluacionDTO> listarPorSeccion(Long idSeccion) {
         return evaluacionRepository.findBySeccion_IdSeccion(idSeccion).stream()
                 .map(e -> EvaluacionDTO.builder()
                         .idEvaluacion(e.getIdEvaluacion())
@@ -49,6 +50,6 @@ public class EvaluacionService {
                         .fechaExamen(e.getFechaExamen())
                         .fechaPublicacionNotas(e.getFechaPublicacionNotas())
                         .build())
-                .collect(Collectors.toList());
+                .toList();
     }
 }

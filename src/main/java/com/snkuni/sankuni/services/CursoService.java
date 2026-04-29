@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.UUID;
+
 
 @Service
 @RequiredArgsConstructor
@@ -20,7 +20,7 @@ public class CursoService {
     private final CarreraRepository carreraRepository;
 
     @Transactional(readOnly = true)
-    public List<CursoDTO> listarPorCarrera(UUID idCarrera) {
+    public List<CursoDTO> listarPorCarrera(Long idCarrera) {
         return cursoRepository.findByCarrera_IdCarrera(idCarrera).stream().map(curso -> 
             CursoDTO.builder()
                 .idCurso(curso.getIdCurso())

@@ -5,15 +5,15 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Data;
-import java.util.UUID;
+
 
 @Data
 @Builder
 public class CursoDTO {
-    private UUID idCurso;
+    private Long idCurso;
     
     @NotNull(message = "El ID de la carrera es obligatorio")
-    private UUID carreraId;
+    private Long carreraId;
     
     private String nombreCarrera;
     

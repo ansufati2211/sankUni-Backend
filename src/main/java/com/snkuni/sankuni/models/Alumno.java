@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
-import java.util.UUID;
+
 
 @Entity
 @Table(name = "alumnos")
@@ -15,9 +15,9 @@ import java.util.UUID;
 public class Alumno {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_alumno", updatable = false, nullable = false)
-    private UUID idAlumno;
+    private Long idAlumno;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usuario_id", nullable = false, unique = true)

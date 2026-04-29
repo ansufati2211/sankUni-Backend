@@ -22,17 +22,16 @@ public class ApplicationConfig {
     public UserDetailsService userDetailsService() {
         return username -> usuarioRepository.findByEmail(username)
                 .map(UserDetailsImpl::new)
-                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado en la base de datos"));
+                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado con el email: " + username));
     }
 
-    // ¡Aquí eliminamos el 'throws Exception' para que SonarLint esté feliz!
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) {
         try {
             return config.getAuthenticationManager();
-        } catch (Exception ex) {
-            // Lanzamos una excepción específica en lugar de una genérica
-            throw new IllegalStateException("Error al inicializar el AuthenticationManager", ex);
+        } catch (Exception e) {
+            // SonarLint aprueba IllegalStateException
+            throw new IllegalStateException("Error al obtener AuthenticationManager", e); 
         }
     }
 

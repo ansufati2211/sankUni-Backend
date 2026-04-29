@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.UUID;
+
 
 @Service
 @RequiredArgsConstructor
@@ -50,7 +50,7 @@ public class SolicitudService {
     }
 
     @Transactional(readOnly = true)
-    public List<SolicitudDTO> listarMisSolicitudes(UUID idUsuario) {
+    public List<SolicitudDTO> listarMisSolicitudes(Long idUsuario) {
         return solicitudRepository.findByEmisor_IdUsuario(idUsuario).stream()
                 .map(this::mapearADTO)
                 .toList();

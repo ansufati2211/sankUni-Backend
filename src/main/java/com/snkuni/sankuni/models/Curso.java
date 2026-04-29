@@ -3,7 +3,7 @@ package com.snkuni.sankuni.models;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.UUID;
+
 
 @Entity
 @Table(name = "cursos")
@@ -13,9 +13,9 @@ import java.util.UUID;
 public class Curso {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_curso", updatable = false, nullable = false)
-    private UUID idCurso;
+    private Long idCurso;
 
     // Relación Muchos Cursos pertenecen a Una Carrera
     @ManyToOne(fetch = FetchType.LAZY)

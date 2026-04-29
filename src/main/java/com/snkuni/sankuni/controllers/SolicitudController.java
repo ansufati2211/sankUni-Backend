@@ -9,7 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
+
 
 @RestController
 @RequestMapping("/api/v1/solicitudes")
@@ -24,7 +24,7 @@ public class SolicitudController {
 
    // Agrégale ("id") adentro del PathVariable
     @GetMapping("/usuario/{id}")
-    public ResponseEntity<List<SolicitudDTO>> listar(@PathVariable("id") UUID id) {
+    public ResponseEntity<List<SolicitudDTO>> listar(@PathVariable("id") Long id) {
         return ResponseEntity.ok(solicitudService.listarMisSolicitudes(id));
     }
 }

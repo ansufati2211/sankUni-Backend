@@ -9,7 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.UUID;
+
 
 @RestController
 @RequestMapping("/api/v1/matriculas")
@@ -20,7 +20,7 @@ public class MatriculaController {
 
     @PostMapping("/automatricula")
     public ResponseEntity<ApiResponseDTO> registrarMatricula(@Valid @RequestBody MatriculaRequestDTO request) {
-        UUID idMatricula = matriculaService.procesarAutomatricula(request);
+        Long idMatricula = matriculaService.procesarAutomatricula(request);
         return new ResponseEntity<>(new ApiResponseDTO(true, "Matrícula procesada con éxito", idMatricula), HttpStatus.CREATED);
     }
 }

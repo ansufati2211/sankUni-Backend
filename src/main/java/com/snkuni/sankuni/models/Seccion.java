@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalTime;
-import java.util.UUID;
+
 
 @Entity
 @Table(name = "secciones")
@@ -14,9 +14,9 @@ import java.util.UUID;
 public class Seccion {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_seccion", updatable = false, nullable = false)
-    private UUID idSeccion;
+    private Long idSeccion;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "curso_id", nullable = false)

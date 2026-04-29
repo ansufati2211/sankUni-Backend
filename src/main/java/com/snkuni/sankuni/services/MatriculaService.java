@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.UUID;
+
 
 @Service
 @RequiredArgsConstructor
@@ -16,7 +16,7 @@ public class MatriculaService {
     private final MatriculaRepository matriculaRepository;
 
     @Transactional
-    public UUID procesarAutomatricula(MatriculaRequestDTO request) {
+    public Long procesarAutomatricula(MatriculaRequestDTO request) {
         try {
             // Delega la responsabilidad transaccional a tu Función en PostgreSQL
             return matriculaRepository.matricularAlumnoTransaccional(

@@ -9,7 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
+
 
 @RestController
 @RequestMapping("/api/v1/cursos")
@@ -19,7 +19,7 @@ public class CursoController {
     private final CursoService cursoService;
 
     @GetMapping("/carrera/{idCarrera}")
-    public ResponseEntity<List<CursoDTO>> listarCursosPorCarrera(@PathVariable("idCarrera") UUID idCarrera) {
+    public ResponseEntity<List<CursoDTO>> listarCursosPorCarrera(@PathVariable("idCarrera") Long idCarrera) {
         return ResponseEntity.ok(cursoService.listarPorCarrera(idCarrera));
     }
 

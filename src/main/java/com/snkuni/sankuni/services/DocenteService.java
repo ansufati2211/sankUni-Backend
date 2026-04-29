@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.UUID;
+
 
 @Service
 @RequiredArgsConstructor
@@ -17,7 +17,7 @@ public class DocenteService {
     private final DocenteRepository docenteRepository;
 
     @Transactional(readOnly = true)
-    public DocenteDTO obtenerPerfilPorUsuario(UUID idUsuario) {
+    public DocenteDTO obtenerPerfilPorUsuario(Long idUsuario) {
         return docenteRepository.findByUsuario_IdUsuario(idUsuario)
                 .map(docente -> DocenteDTO.builder()
                         .idDocente(docente.getIdDocente())

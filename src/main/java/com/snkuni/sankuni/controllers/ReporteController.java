@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
+
 
 @RestController
 @RequestMapping("/api/v1/reportes")
@@ -22,17 +22,17 @@ public class ReporteController {
     }
 
     @GetMapping("/historial/{alumnoId}")
-    public ResponseEntity<List<Map<String, Object>>> getHistorial(@PathVariable("alumnoId") UUID alumnoId) {
+    public ResponseEntity<List<Map<String, Object>>> getHistorial(@PathVariable("alumnoId") Long alumnoId) {
         return ResponseEntity.ok(reporteService.obtenerHistorialAcademico(alumnoId));
     }
 
     @GetMapping("/semaforo/{docenteId}")
-    public ResponseEntity<List<Map<String, Object>>> getSemaforo(@PathVariable("docenteId") UUID docenteId) {
+    public ResponseEntity<List<Map<String, Object>>> getSemaforo(@PathVariable("docenteId") Long docenteId) {
         return ResponseEntity.ok(reporteService.obtenerSemaforoNotasDeDocente(docenteId));
     }
 
     @GetMapping("/horario/{alumnoId}")
-    public ResponseEntity<List<Map<String, Object>>> getHorario(@PathVariable("alumnoId") UUID alumnoId) {
+    public ResponseEntity<List<Map<String, Object>>> getHorario(@PathVariable("alumnoId") Long alumnoId) {
         return ResponseEntity.ok(reporteService.obtenerHorarioAlumno(alumnoId));
     }
 }

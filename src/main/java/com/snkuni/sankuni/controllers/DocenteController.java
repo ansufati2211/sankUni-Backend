@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.UUID;
+
 
 @RestController
 @RequestMapping("/api/v1/docentes")
@@ -18,7 +18,7 @@ public class DocenteController {
     // Obtiene el perfil completo del docente usando el ID de su usuario
   // Agrégale ("usuarioId") adentro del PathVariable
     @GetMapping("/perfil/{usuarioId}")
-    public ResponseEntity<DocenteDTO> obtenerPerfilUsuario(@PathVariable("usuarioId") UUID usuarioId) {
+    public ResponseEntity<DocenteDTO> obtenerPerfilUsuario(@PathVariable("usuarioId") Long usuarioId) {
         return ResponseEntity.ok(docenteService.obtenerPerfilPorUsuario(usuarioId));
     }
 }

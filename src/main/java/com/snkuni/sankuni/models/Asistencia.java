@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDate;
-import java.util.UUID;
+
 
 @Entity
 @Table(name = "asistencia", uniqueConstraints = {
@@ -16,9 +16,9 @@ import java.util.UUID;
 public class Asistencia {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_asistencia", updatable = false, nullable = false)
-    private UUID idAsistencia;
+    private Long idAsistencia;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "seccion_id", nullable = false)

@@ -3,7 +3,7 @@ package com.snkuni.sankuni.models;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.UUID;
+
 
 @Entity
 @Table(name = "carreras")
@@ -13,9 +13,9 @@ import java.util.UUID;
 public class Carrera {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_carrera", updatable = false, nullable = false)
-    private UUID idCarrera;
+    private Long idCarrera;
 
     @Column(nullable = false, unique = true, length = 100)
     private String nombre;

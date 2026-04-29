@@ -4,7 +4,7 @@ import com.snkuni.sankuni.models.enums.TeacherStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.UUID;
+
 
 @Entity
 @Table(name = "docentes")
@@ -14,9 +14,9 @@ import java.util.UUID;
 public class Docente {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_docente", updatable = false, nullable = false)
-    private UUID idDocente;
+    private Long idDocente;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usuario_id", nullable = false, unique = true)

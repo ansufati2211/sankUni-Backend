@@ -5,10 +5,10 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
-import java.util.UUID;
+
 
 @Repository
-public interface AlumnoRepository extends JpaRepository<Alumno, UUID> {
+public interface AlumnoRepository extends JpaRepository<Alumno, Long> {
     // Permite encontrar el perfil de alumno usando el ID de su cuenta de usuario logueada
-    Optional<Alumno> findByUsuario_IdUsuario(UUID idUsuario);
+    Optional<Alumno> findByUsuario_IdUsuario(Long idUsuario);
 }

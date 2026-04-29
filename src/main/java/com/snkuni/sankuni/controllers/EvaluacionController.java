@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
+
 
 @RestController
 @RequestMapping("/api/v1/evaluaciones")
@@ -23,7 +23,7 @@ public class EvaluacionController {
 
  // Agrégale ("id") adentro del PathVariable
     @GetMapping("/seccion/{id}")
-    public ResponseEntity<List<EvaluacionDTO>> listar(@PathVariable("id") UUID id) {
+    public ResponseEntity<List<EvaluacionDTO>> listar(@PathVariable("id") Long id) {
         return ResponseEntity.ok(evaluacionService.listarPorSeccion(id));
     }
 }

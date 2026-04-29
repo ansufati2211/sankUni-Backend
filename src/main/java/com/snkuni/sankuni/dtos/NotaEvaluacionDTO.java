@@ -7,18 +7,18 @@ import lombok.Builder;
 import lombok.Data;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.UUID;
+
 
 @Data
 @Builder
 public class NotaEvaluacionDTO {
-    private UUID idNota;
+    private Long idNota;
     
     @NotNull(message = "La evaluación es obligatoria")
-    private UUID evaluacionId;
+    private Long evaluacionId;
     
     @NotNull(message = "El alumno es obligatorio")
-    private UUID alumnoId;
+    private Long alumnoId;
     
     private String nombreAlumno;
     

@@ -8,15 +8,15 @@ import lombok.Builder;
 import lombok.Data;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.UUID;
+
 
 @Data
 @Builder
 public class EvaluacionDTO {
-    private UUID idEvaluacion;
+    private Long idEvaluacion;
     
     @NotNull(message = "La sección es obligatoria")
-    private UUID seccionId;
+    private Long seccionId;
     
     @NotBlank(message = "El nombre del examen es obligatorio")
     private String nombreExamen;

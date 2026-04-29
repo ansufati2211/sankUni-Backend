@@ -5,7 +5,7 @@ import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.UUID;
+
 
 @Entity
 @Table(name = "evaluaciones")
@@ -15,9 +15,9 @@ import java.util.UUID;
 public class Evaluacion {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_evaluacion", updatable = false, nullable = false)
-    private UUID idEvaluacion;
+    private Long idEvaluacion;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "seccion_id", nullable = false)

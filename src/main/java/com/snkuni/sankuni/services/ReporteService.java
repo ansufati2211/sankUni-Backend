@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
+
 
 @Service
 @RequiredArgsConstructor
@@ -21,20 +21,20 @@ public class ReporteService {
     }
 
     // Conecta con la vista: vw_historial_academico
-    public List<Map<String, Object>> obtenerHistorialAcademico(UUID idAlumno) {
+    public List<Map<String, Object>> obtenerHistorialAcademico(Long idAlumno) {
         String sql = "SELECT * FROM vw_historial_academico WHERE id_alumno = ?";
         return jdbcTemplate.queryForList(sql, idAlumno);
     }
 
     // Conecta con la vista: vw_semaforo_notas
-    public List<Map<String, Object>> obtenerSemaforoNotasDeDocente(UUID idDocente) {
+    public List<Map<String, Object>> obtenerSemaforoNotasDeDocente(Long idDocente) {
         // Asumiendo que quieres filtrar el semáforo por docente activo
         String sql = "SELECT * FROM vw_semaforo_notas WHERE docente = (SELECT u.nombre_completo FROM docentes d JOIN usuarios u ON d.usuario_id = u.id_usuario WHERE d.id_docente = ?)";
         return jdbcTemplate.queryForList(sql, idDocente);
     }
 
     // Conecta con la vista: vw_horario_alumno
-    public List<Map<String, Object>> obtenerHorarioAlumno(UUID idAlumno) {
+    public List<Map<String, Object>> obtenerHorarioAlumno(Long idAlumno) {
         String sql = "SELECT * FROM vw_horario_alumno WHERE id_alumno = ?";
         return jdbcTemplate.queryForList(sql, idAlumno);
     }
