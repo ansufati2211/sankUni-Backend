@@ -25,14 +25,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final UserDetailsService userDetailsService;
 
 // Reemplaza esta parte exacta en tu JwtAuthenticationFilter.java
-    @Override
-    protected void doFilterInternal(
-            HttpServletRequest request,
-            HttpServletResponse response,
-            FilterChain filterChain
-    ) throws ServletException, IOException {
 
-        final String authHeader = request.getHeader("Authorization");
+    @Override
+protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+        throws ServletException, IOException {
+    
+    // Si la ruta es el login, no validar nada y seguir de largo
+    if (request.getServletPath().contains("/api/v1/auth")) {
+        filterChain.doFilter(request, response);
+        return;
+    }
+
+    final String authHeader = request.getHeader("Authorization");
         final String jwt;
         final String userEmail;
 // ... (El resto del código hacia abajo se mantiene igual)

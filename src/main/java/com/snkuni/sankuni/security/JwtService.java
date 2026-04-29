@@ -32,15 +32,23 @@ public class JwtService {
         return claimsResolver.apply(claims);
     }
 
-    public String generateToken(UserDetails userDetails) {
-        return Jwts.builder()
-                .setSubject(userDetails.getUsername())
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + jwtExpiration))
-                .signWith(getSignInKey(), SignatureAlgorithm.HS256)
-                .compact();
-    }
+ public String generateToken(UserDetails userDetails) {
+    // 1. Obtenemos los datos extendidos de tu UserDetailsImpl
+    UserDetailsImpl userCustom = (UserDetailsImpl) userDetails;
+    
+    // 2. Creamos un mapa de "Claims" (datos extra)
+    java.util.Map<String, Object> extraClaims = new java.util.HashMap<>();
+    extraClaims.put("userId", userCustom.getUsuario().getIdUsuario()); // El nuevo Long
+    extraClaims.put("role", userCustom.getAuthorities().iterator().next().getAuthority());
 
+    return Jwts.builder()
+            .setClaims(extraClaims) // Metemos los datos extra
+            .setSubject(userDetails.getUsername())
+            .setIssuedAt(new Date(System.currentTimeMillis()))
+            .setExpiration(new Date(System.currentTimeMillis() + jwtExpiration))
+            .signWith(getSignInKey(), SignatureAlgorithm.HS256)
+            .compact();
+}
     public boolean isTokenValid(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
         return (username.equals(userDetails.getUsername())) && !isTokenExpired(token);

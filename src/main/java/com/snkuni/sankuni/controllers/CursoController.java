@@ -18,6 +18,12 @@ public class CursoController {
 
     private final CursoService cursoService;
 
+    // Esta es la ruta que estaba causando el error
+    @GetMapping
+    public ResponseEntity<List<CursoDTO>> listarCursos() {
+        return ResponseEntity.ok(cursoService.listarTodos());
+    }
+
     @GetMapping("/carrera/{idCarrera}")
     public ResponseEntity<List<CursoDTO>> listarCursosPorCarrera(@PathVariable("idCarrera") Long idCarrera) {
         return ResponseEntity.ok(cursoService.listarPorCarrera(idCarrera));

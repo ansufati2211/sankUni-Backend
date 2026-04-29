@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/docentes")
@@ -15,10 +15,21 @@ public class DocenteController {
 
     private final DocenteService docenteService;
 
-    // Obtiene el perfil completo del docente usando el ID de su usuario
-  // Agrégale ("usuarioId") adentro del PathVariable
+    // SOLUCIÓN AL FALLO: GET http://localhost:8080/api/v1/docentes
+    @GetMapping
+    public ResponseEntity<List<DocenteDTO>> listarTodos() {
+        return ResponseEntity.ok(docenteService.listarTodos());
+    }
+
+    // CORREGIDO: Uso de Long para el ID
+    @GetMapping("/{id}")
+    public ResponseEntity<DocenteDTO> obtenerPorId(@PathVariable("id") Long id) {
+        return ResponseEntity.ok(docenteService.obtenerPorId(id));
+    }
+
+    // Perfil vinculado al Usuario (Login)
     @GetMapping("/perfil/{usuarioId}")
-    public ResponseEntity<DocenteDTO> obtenerPerfilUsuario(@PathVariable("usuarioId") Long usuarioId) {
+    public ResponseEntity<DocenteDTO> obtenerPerfilPorUsuario(@PathVariable("usuarioId") Long usuarioId) {
         return ResponseEntity.ok(docenteService.obtenerPerfilPorUsuario(usuarioId));
     }
 }

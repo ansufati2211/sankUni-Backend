@@ -20,18 +20,17 @@ public class CursoService {
     private final CarreraRepository carreraRepository;
 
     @Transactional(readOnly = true)
+    public List<CursoDTO> listarTodos() {
+        return cursoRepository.findAll().stream()
+                .map(this::mapearADto)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
     public List<CursoDTO> listarPorCarrera(Long idCarrera) {
-        return cursoRepository.findByCarrera_IdCarrera(idCarrera).stream().map(curso -> 
-            CursoDTO.builder()
-                .idCurso(curso.getIdCurso())
-                .carreraId(curso.getCarrera().getIdCarrera())
-                .nombreCarrera(curso.getCarrera().getNombre())
-                .nombre(curso.getNombre())
-                .creditos(curso.getCreditos())
-                .temarioUrl(curso.getTemarioUrl())
-                .descripcionInformativa(curso.getDescripcionInformativa())
-                .build()
-        ).toList();
+        return cursoRepository.findByCarrera_IdCarrera(idCarrera).stream()
+                .map(this::mapearADto)
+                .toList();
     }
 
     @Transactional
@@ -51,5 +50,18 @@ public class CursoService {
         dto.setIdCurso(guardado.getIdCurso());
         dto.setNombreCarrera(carrera.getNombre());
         return dto;
+    }
+
+    // Método de apoyo para evitar repetir código
+    private CursoDTO mapearADto(Curso curso) {
+        return CursoDTO.builder()
+                .idCurso(curso.getIdCurso())
+                .carreraId(curso.getCarrera().getIdCarrera())
+                .nombreCarrera(curso.getCarrera().getNombre())
+                .nombre(curso.getNombre())
+                .creditos(curso.getCreditos())
+                .temarioUrl(curso.getTemarioUrl())
+                .descripcionInformativa(curso.getDescripcionInformativa())
+                .build();
     }
 }
