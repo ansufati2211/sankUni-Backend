@@ -15,8 +15,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
-
 
 @Service
 @RequiredArgsConstructor
@@ -28,32 +28,41 @@ public class SolicitudService {
 
     @Transactional
     public SolicitudDTO crearSolicitud(SolicitudRequestDTO request) {
-        // ... (el código de creación se mantiene exactamente igual) ...
         Usuario emisor = usuarioRepository.findById(request.getEmisorId())
-                .orElseThrow(() -> new ResourceNotFoundException("Usuario emisor no encontrado"));
-
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
         Seccion seccion = null;
         if (request.getSeccionId() != null) {
             seccion = seccionRepository.findById(request.getSeccionId()).orElse(null);
         }
-
         Solicitud solicitud = Solicitud.builder()
-                .emisor(emisor)
-                .tipo(TipoSolicitud.valueOf(request.getTipo()))
-                .seccion(seccion)
-                .descripcion(request.getDescripcion())
-                .estado(RequestStatus.PENDIENTE)
-                .build();
-
-        Solicitud guardada = solicitudRepository.save(solicitud);
-        return mapearADTO(guardada);
+                .emisor(emisor).tipo(TipoSolicitud.valueOf(request.getTipo()))
+                .seccion(seccion).descripcion(request.getDescripcion())
+                .estado(RequestStatus.PENDIENTE).build();
+        return mapearADTO(solicitudRepository.save(solicitud));
     }
 
     @Transactional(readOnly = true)
     public List<SolicitudDTO> listarMisSolicitudes(Long idUsuario) {
-        return solicitudRepository.findByEmisor_IdUsuario(idUsuario).stream()
-                .map(this::mapearADTO)
-                .toList();
+        return solicitudRepository.findByEmisor_IdUsuario(idUsuario).stream().map(this::mapearADTO).toList();
+    }
+
+    // NUEVO: Para el panel del ADMIN (Todos los trámites)
+    @Transactional(readOnly = true)
+    public List<SolicitudDTO> listarTodas() {
+        return solicitudRepository.findAll().stream().map(this::mapearADTO).toList();
+    }
+
+    // NUEVO: Para que el ADMIN acepte o rechace
+    @Transactional
+    public SolicitudDTO responderSolicitud(Long idSolicitud, String estado, String observacion) {
+        Solicitud s = solicitudRepository.findById(idSolicitud)
+                .orElseThrow(() -> new ResourceNotFoundException("Trámite no encontrado"));
+        
+        s.setEstado(RequestStatus.valueOf(estado.toUpperCase()));
+        s.setObservacionCoordinador(observacion);
+        s.setFechaRespuesta(LocalDateTime.now());
+        
+        return mapearADTO(solicitudRepository.save(s));
     }
 
     private SolicitudDTO mapearADTO(Solicitud s) {

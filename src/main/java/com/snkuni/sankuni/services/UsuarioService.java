@@ -1,6 +1,7 @@
 package com.snkuni.sankuni.services;
 
 import com.snkuni.sankuni.dtos.UsuarioDTO;
+import com.snkuni.sankuni.models.Usuario;
 import com.snkuni.sankuni.repositories.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,12 +18,20 @@ public class UsuarioService {
     @Transactional(readOnly = true)
     public List<UsuarioDTO> listarTodosLosUsuarios() {
         return usuarioRepository.findAll().stream()
-                .map(u -> UsuarioDTO.builder()
-                        .idUsuario(u.getIdUsuario())
-                        .nombreCompleto(u.getNombreCompleto())
-                        .email(u.getEmail())
-                        .rol(u.getRol().name())
-                        .build())
+                .map(this::mapearADto)
                 .toList(); 
+    }
+    
+    // Centralizamos el mapeo para incluir el DNI y los nombres separados
+    private UsuarioDTO mapearADto(Usuario usuario) {
+        return UsuarioDTO.builder()
+                .idUsuario(usuario.getIdUsuario())
+                .dni(usuario.getDni())
+                .nombres(usuario.getNombres())
+                .apellidos(usuario.getApellidos())
+                .nombreCompleto(usuario.getNombreCompleto()) // Funciona gracias al @Transient
+                .email(usuario.getEmail())
+                .rol(usuario.getRol().name())
+                .build();
     }
 }

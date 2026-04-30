@@ -3,17 +3,13 @@ package com.snkuni.sankuni.models;
 import com.snkuni.sankuni.models.enums.StudentStatus;
 import jakarta.persistence.*;
 import lombok.*;
-
+import java.math.BigDecimal; // <-- AGREGADO
 import java.time.LocalDate;
-
 
 @Entity
 @Table(name = "alumnos")
-@Getter @Setter
-@NoArgsConstructor @AllArgsConstructor
-@Builder
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 public class Alumno {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_alumno", updatable = false, nullable = false)
@@ -35,4 +31,9 @@ public class Alumno {
     @Column(name = "fecha_ingreso")
     @Builder.Default
     private LocalDate fechaIngreso = LocalDate.now();
+
+    // <-- ASEGÚRATE QUE SEA BigDecimal y no Double
+    @Column(name = "promedio_historico", precision = 4, scale = 2)
+    @Builder.Default
+    private BigDecimal promedioHistorico = BigDecimal.ZERO; 
 }

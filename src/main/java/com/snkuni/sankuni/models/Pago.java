@@ -7,31 +7,24 @@ import org.hibernate.annotations.CreationTimestamp;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-
 @Entity
 @Table(name = "pagos")
-@Getter @Setter
-@NoArgsConstructor @AllArgsConstructor
-@Builder
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 public class Pago {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_pago", updatable = false, nullable = false)
     private Long idPago;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "matricula_id", nullable = false)
-    private Matricula matricula;
+  @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "cuota_id", nullable = false)
+    private CuotaAlumno cuota;
 
-    @Column(nullable = false, precision = 10, scale = 2)
-    private BigDecimal monto;
+    @Column(nullable = false)
+    private BigDecimal montoPagado;
 
-    @Column(length = 100)
     @Builder.Default
-    private String concepto = "PAGO_MATRICULA";
+    private String metodoPago = "TARJETA";
 
     @CreationTimestamp
-    @Column(name = "fecha_pago", updatable = false)
     private LocalDateTime fechaPago;
 }

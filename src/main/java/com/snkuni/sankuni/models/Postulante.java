@@ -1,19 +1,18 @@
 package com.snkuni.sankuni.models;
 
-import com.snkuni.sankuni.models.enums.UserRole;
+import com.snkuni.sankuni.models.enums.EstadoPostulante;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "usuarios")
+@Table(name = "postulantes")
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
-public class Usuario {
+public class Postulante {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long idUsuario;
+    private Long idPostulante;
 
     @Column(unique = true, nullable = false, length = 15)
     private String dni;
@@ -24,23 +23,23 @@ public class Usuario {
     @Column(nullable = false, length = 100)
     private String apellidos;
 
-    @Column(unique = true, nullable = false, length = 100)
-    private String email;
+    @Column(nullable = false, length = 100)
+    private String correo;
 
-    @Column(nullable = false)
-    private String passwordHash;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "carrera_id")
+    private Carrera carrera;
+
+    @Column(length = 50)
+    private String sede;
+
+    @Column(length = 20)
+    private String turno;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private UserRole rol;
+    @Builder.Default
+    private EstadoPostulante estado = EstadoPostulante.EN_REVISION;
 
     @CreationTimestamp
-    private LocalDateTime creadoEn;
-
-    @UpdateTimestamp
-    private LocalDateTime actualizadoEn;
-    @Transient
-    public String getNombreCompleto() {
-        return this.nombres + " " + this.apellidos;
-    }
+    private LocalDateTime fechaPostulacion;
 }

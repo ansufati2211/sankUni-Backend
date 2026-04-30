@@ -1,17 +1,14 @@
 package com.snkuni.sankuni.dtos;
 
-import lombok.Builder;
-import lombok.Data;
-import java.math.BigDecimal;
+import lombok.*;
+import java.math.BigDecimal; // <-- AGREGADO
 import java.time.LocalDateTime;
 
-
-@Data
-@Builder
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 public class PagoDTO {
     private Long idPago;
-    private Long idMatricula;
-    private BigDecimal monto;
-    private String concepto;
+    private Long idCuota;
+    private BigDecimal montoPagado; // <-- ASEGÚRATE QUE SEA BigDecimal
+    private String metodoPago;
     private LocalDateTime fechaPago;
 }

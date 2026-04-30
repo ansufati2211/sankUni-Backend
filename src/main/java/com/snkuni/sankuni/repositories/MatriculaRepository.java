@@ -9,11 +9,9 @@ import org.springframework.stereotype.Repository;
 import java.math.BigDecimal;
 import java.util.List;
 
-
 @Repository
 public interface MatriculaRepository extends JpaRepository<Matricula, Long> {
     
-    // Ejecuta la función de PostgreSQL que tú creaste
     @Query(value = "SELECT fn_matricular_alumno(:p_alumno_id, :p_seccion_id, :p_monto)", nativeQuery = true)
     Long matricularAlumnoTransaccional(
             @Param("p_alumno_id") Long alumnoId, 
@@ -22,4 +20,5 @@ public interface MatriculaRepository extends JpaRepository<Matricula, Long> {
     );
 
     List<Matricula> findByAlumno_IdAlumno(Long idAlumno);
+    List<Matricula> findBySeccion_IdSeccion(Long idSeccion); // NUEVO
 }

@@ -2,14 +2,11 @@ package com.snkuni.sankuni.repositories;
 
 import com.snkuni.sankuni.models.Usuario;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
-
 import java.util.Optional;
 
-
-@Repository
 public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
-    // Fundamental para cuando implementemos Spring Security y el Login
     Optional<Usuario> findByEmail(String email);
+    Optional<Usuario> findByDni(String dni); // NUEVO
     boolean existsByEmail(String email);
+    boolean existsByDni(String dni); // NUEVO
 }
