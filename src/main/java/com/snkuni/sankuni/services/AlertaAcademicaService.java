@@ -1,6 +1,8 @@
 package com.snkuni.sankuni.services;
 
 import com.snkuni.sankuni.dtos.AlertaAcademicaDTO;
+import com.snkuni.sankuni.exceptions.ResourceNotFoundException;
+import com.snkuni.sankuni.models.AlertaAcademica;
 import com.snkuni.sankuni.repositories.AlertaAcademicaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,4 +25,12 @@ public class AlertaAcademicaService {
                         .fechaCreacion(a.getFechaCreacion())
                         .build()).toList();
     }
+    
+    public void resolverAlerta(Long idAlerta) {
+    AlertaAcademica alerta = alertaRepository.findById(idAlerta)
+            .orElseThrow(() -> new ResourceNotFoundException("Alerta no encontrada"));
+    alerta.setResuelta(true);
+    alertaRepository.save(alerta);
+}
+    
 }

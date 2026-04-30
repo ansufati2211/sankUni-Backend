@@ -1,5 +1,6 @@
 package com.snkuni.sankuni.exceptions;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -39,11 +40,31 @@ public class GlobalExceptionHandler {
         response.put("timestamp", LocalDateTime.now());
         response.put("status", HttpStatus.BAD_REQUEST.value());
         response.put("errores", errores);
+        response.put("message", "Error de validación en los campos enviados."); 
         
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
-    // 4. Manejo de Errores Críticos (Base de datos PostgreSQL, Stored Procedures, etc.)
+    // 4. Manejo Inteligente de Integridad de Base de Datos (UNIQUE, CHECK)
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<Map<String, Object>> handleDataIntegrity(DataIntegrityViolationException ex) {
+        // Extraemos el mensaje real y profundo de la base de datos PostgreSQL
+        String mensajeDB = ex.getMostSpecificCause() != null ? ex.getMostSpecificCause().getMessage() : "";
+
+        // Si el error es por un DNI o Correo repetido (Violación de UNIQUE)
+        if (mensajeDB.toLowerCase().contains("duplicate") || mensajeDB.toLowerCase().contains("llave duplicada")) {
+            return buildResponse("Error: El DNI o Correo Electrónico ya se encuentra registrado en el sistema.", HttpStatus.CONFLICT);
+        } 
+        // Si el error es por el horario de la sección (Violación de CHECK)
+        else if (mensajeDB.toLowerCase().contains("check_horario")) {
+            return buildResponse("Error de horario: La hora de inicio debe ser menor a la hora de fin.", HttpStatus.BAD_REQUEST);
+        }
+
+        // Para cualquier otro error de integridad desconocido
+        return buildResponse("Ocurrió un error de integridad en la base de datos.", HttpStatus.BAD_REQUEST);
+    }
+
+    // 5. Manejo de Errores Críticos (Fallback)
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> handleAllExceptions(Exception ex) {
         String message = ex.getMessage();
@@ -51,22 +72,21 @@ public class GlobalExceptionHandler {
         // Limpiamos los mensajes feos del motor SQL
         if (message != null && message.contains("Error:")) {
             message = message.substring(message.indexOf("Error:"));
-        } else if (message != null && (message.contains("duplicate key value") || message.contains("llave duplicada"))) {
-            message = "Operación rechazada: Ya existe un registro con esos datos exactos en la base de datos.";
         } else {
             message = "Ocurrió un error interno en el servidor.";
-            ex.printStackTrace(); // Imprime en consola para que puedas debugear
+            ex.printStackTrace(); // Imprime en consola para debugear
         }
         
         return buildResponse(message, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    // Método auxiliar para no repetir código al armar el JSON de respuesta
+    // Método auxiliar unificado para armar el JSON de respuesta
     private ResponseEntity<Map<String, Object>> buildResponse(String message, HttpStatus status) {
         Map<String, Object> response = new HashMap<>();
         response.put("timestamp", LocalDateTime.now());
         response.put("status", status.value());
-        response.put("error", message);
+        response.put("message", message); // Para que lo lea el JS (data.message)
+        response.put("error", message);   // Por si algún fetch antiguo usa data.error
         return new ResponseEntity<>(response, status);
     }
 }
