@@ -1,4 +1,3 @@
-// src/main/java/com/snkuni/sankuni/services/PostulanteService.java
 package com.snkuni.sankuni.services;
 
 import com.snkuni.sankuni.dtos.PostulanteDTO;
@@ -14,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -26,6 +26,10 @@ public class PostulanteService {
     private final CuotaAlumnoRepository cuotaRepository;
     private final PasswordEncoder passwordEncoder;
     private final JavaMailSender mailSender;
+    
+    // Agregados para Auto-Matrícula
+    private final SeccionRepository seccionRepository;
+    private final MatriculaRepository matriculaRepository;
 
     @Transactional
     public PostulanteDTO registrar(PostulanteDTO dto) {
@@ -66,21 +70,46 @@ public class PostulanteService {
         Alumno a = Alumno.builder().usuario(u).carrera(p.getCarrera()).build();
         a = alumnoRepository.save(a);
 
-        // 3. Generar su primera Cuota de Matrícula
-        CuotaAlumno primeraCuota = CuotaAlumno.builder()
-                .alumno(a)
-                .cicloAcademico("2026-I")
-                .mesCorrespondiente("Matrícula de Ingreso")
+        // 3. Generar Paquete Financiero Completo
+        List<CuotaAlumno> nuevasCuotas = new ArrayList<>();
+        
+        nuevasCuotas.add(CuotaAlumno.builder()
+                .alumno(a).cicloAcademico("2026-I").mesCorrespondiente("Matrícula de Ingreso")
                 .montoTotal(new BigDecimal("150.00"))
                 .estado(EstadoCuota.PENDIENTE)
-                .fechaVencimiento(LocalDate.now().plusDays(7)) // Tiene 7 días para pagar
-                .build();
-        cuotaRepository.save(primeraCuota);
+                .fechaVencimiento(LocalDate.now().plusDays(7)) 
+                .build());
 
-        // 4. Enviar Correo Electrónico Automático
+        BigDecimal montoPension = new BigDecimal("350.00");
+        for (int i = 1; i <= 5; i++) {
+            nuevasCuotas.add(CuotaAlumno.builder()
+                    .alumno(a).cicloAcademico("2026-I")
+                    .mesCorrespondiente("Pensión " + i + " - 2026-I")
+                    .montoTotal(montoPension)
+                    .estado(EstadoCuota.PENDIENTE)
+                    .fechaVencimiento(LocalDate.now().plusDays(30L * i))
+                    .build());
+        }
+        cuotaRepository.saveAll(nuevasCuotas);
+
+        // ==========================================
+        // 4. AUTO-MATRÍCULA ACADÉMICA
+        // ==========================================
+        List<Seccion> clasesPrimerCiclo = seccionRepository.findByCarreraAndCiclo(p.getCarrera().getIdCarrera(), "2026-I");
+        List<Matricula> nuevasMatriculas = new ArrayList<>();
+        
+        for (Seccion sec : clasesPrimerCiclo) {
+            nuevasMatriculas.add(Matricula.builder()
+                    .alumno(a)
+                    .seccion(sec)
+                    .build());
+        }
+        matriculaRepository.saveAll(nuevasMatriculas);
+
+        // 5. Enviar Correo Electrónico Automático
         enviarCorreoBienvenida(u.getEmail(), u.getNombres(), u.getEmail(), p.getDni());
 
-        return "Aprobado. Credenciales generadas y primera cuota asignada.";
+        return "Aprobado. Credenciales generadas y paquete financiero asignado.";
     }
 
     private void enviarCorreoBienvenida(String correoDestino, String nombres, String usuarioLogin, String claveTemporal) {

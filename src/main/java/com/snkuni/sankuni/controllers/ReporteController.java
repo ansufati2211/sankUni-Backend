@@ -36,9 +36,19 @@ public class ReporteController {
         return ResponseEntity.ok(reporteService.obtenerHorarioAlumno(alumnoId));
     }
 
-    // NUEVO: Endpoint para el Dashboard del Administrador
+    // ¡NUEVO! Endpoint para cargar los cursos y alumnos del Docente
+    @GetMapping("/horario-docente/{docenteId}")
+    public ResponseEntity<List<Map<String, Object>>> getHorarioDocente(@PathVariable("docenteId") Long docenteId) {
+        return ResponseEntity.ok(reporteService.obtenerHorarioDocente(docenteId));
+    }
+
     @GetMapping("/dashboard-admin")
     public ResponseEntity<DashboardAdminDTO> getDashboardAdmin() {
         return ResponseEntity.ok(reporteService.obtenerDashboardAdmin());
+    }
+    
+    @GetMapping("/rendimiento")
+    public ResponseEntity<List<Map<String, Object>>> getRendimientoGlobal() {
+        return ResponseEntity.ok(reporteService.obtenerRendimientoGlobal());
     }
 }

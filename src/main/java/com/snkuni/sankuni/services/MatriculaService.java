@@ -20,21 +20,19 @@ public class MatriculaService {
     public Long procesarAutomatricula(MatriculaRequestDTO request) {
         try {
             return matriculaRepository.matricularAlumnoTransaccional(
-                    request.getIdAlumno(),
-                    request.getIdSeccion(),
-                    request.getMontoPago()
+                    request.getIdAlumno(), request.getIdSeccion(), request.getMontoPago()
             );
         } catch (Exception ex) {
             throw new BusinessLogicException("Fallo en la matrícula: " + ex.getMessage());
         }
     }
 
-    // NUEVO: Para que el docente vea a los alumnos de su clase
     @Transactional(readOnly = true)
     public List<MatriculaDTO> listarAlumnosPorSeccion(Long idSeccion) {
         return matriculaRepository.findBySeccion_IdSeccion(idSeccion).stream()
                 .map(m -> MatriculaDTO.builder()
                         .idMatricula(m.getIdMatricula())
+                        .alumnoId(m.getAlumno().getIdAlumno())
                         .nombreAlumno(m.getAlumno().getUsuario().getNombreCompleto())
                         .cursoYSeccion(m.getSeccion().getCurso().getNombre())
                         .notaFinal(m.getNotaFinal())

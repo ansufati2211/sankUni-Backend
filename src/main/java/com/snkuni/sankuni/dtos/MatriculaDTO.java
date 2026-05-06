@@ -10,6 +10,7 @@ import java.time.LocalDateTime;
 @Builder
 public class MatriculaDTO {
     private Long idMatricula;
+    private Long alumnoId;
     private String nombreAlumno;
     private String cursoYSeccion;
     private BigDecimal notaFinal;

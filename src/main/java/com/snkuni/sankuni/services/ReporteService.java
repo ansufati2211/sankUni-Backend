@@ -31,6 +31,13 @@ public class ReporteService {
         return jdbcTemplate.queryForList("SELECT * FROM vw_horario_alumno WHERE id_alumno = ?", idAlumno);
     }
 
+    public List<Map<String, Object>> obtenerHorarioDocente(Long idDocente) {
+        return jdbcTemplate.queryForList("SELECT * FROM vw_horario_docente WHERE id_docente = ?", idDocente);
+    }
+
+    public List<Map<String, Object>> obtenerRendimientoGlobal() {
+        return jdbcTemplate.queryForList("SELECT * FROM vw_rendimiento_alumno");
+    }
     // NUEVO: Consultas agregadas para el Panel del Admin
     public DashboardAdminDTO obtenerDashboardAdmin() {
         Integer totalAlumnos = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM alumnos", Integer.class);

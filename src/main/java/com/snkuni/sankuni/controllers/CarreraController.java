@@ -26,4 +26,9 @@ public class CarreraController {
     public ResponseEntity<CarreraDTO> crearCarrera(@Valid @RequestBody CarreraDTO dto) {
         return new ResponseEntity<>(carreraService.crearCarrera(dto), HttpStatus.CREATED);
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<CarreraDTO> editarCarrera(@PathVariable Long id, @Valid @RequestBody CarreraDTO dto) {
+        return ResponseEntity.ok(carreraService.editarCarrera(id, dto));
+    }
 }

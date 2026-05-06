@@ -10,16 +10,24 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class SeccionService {
+
     private final SeccionRepository seccionRepository;
     private final CursoRepository cursoRepository;
     private final DocenteRepository docenteRepository;
+    private final EvaluacionRepository evaluacionRepository;
+    
+    // NUEVAS INYECCIONES PARA MATRICULAR ALUMNOS ANTIGUOS
+    private final AlumnoRepository alumnoRepository;
+    private final MatriculaRepository matriculaRepository;
 
     @Transactional
     public SeccionDTO crearSeccion(SeccionDTO dto) {
@@ -27,6 +35,7 @@ public class SeccionService {
 
         Curso curso = cursoRepository.findById(dto.getCursoId())
                 .orElseThrow(() -> new ResourceNotFoundException("Curso no encontrado"));
+
         Docente docente = docenteRepository.findById(dto.getDocenteId())
                 .orElseThrow(() -> new ResourceNotFoundException("Docente no encontrado"));
 
@@ -34,12 +43,42 @@ public class SeccionService {
                 .curso(curso).docente(docente)
                 .cicloAcademico(dto.getCicloAcademico())
                 .diaSemana(dto.getDiaSemana())
-                .horaInicio(horarios[0]) 
-                .horaFin(horarios[1])    
+                .horaInicio(horarios[0])
+                .horaFin(horarios[1])
                 .modalidad(dto.getModalidad() != null ? ModalidadSeccion.valueOf(dto.getModalidad().toUpperCase()) : ModalidadSeccion.PRESENCIAL)
                 .build();
 
-        return mapearADto(seccionRepository.save(seccion));
+        Seccion seccionGuardada = seccionRepository.save(seccion);
+
+        // ==========================================
+        // 1. CREACIÓN AUTOMÁTICA DE 4 EVALUACIONES
+        // ==========================================
+        List<Evaluacion> evaluacionesAutomaticas = new ArrayList<>();
+        
+        evaluacionesAutomaticas.add(Evaluacion.builder().seccion(seccionGuardada).nombreExamen("PC1").pesoPorcentaje(20).fechaExamen(LocalDate.now().plusWeeks(4)).build());
+        evaluacionesAutomaticas.add(Evaluacion.builder().seccion(seccionGuardada).nombreExamen("PC2").pesoPorcentaje(20).fechaExamen(LocalDate.now().plusWeeks(8)).build());
+        evaluacionesAutomaticas.add(Evaluacion.builder().seccion(seccionGuardada).nombreExamen("Examen Parcial").pesoPorcentaje(30).fechaExamen(LocalDate.now().plusWeeks(12)).build());
+        evaluacionesAutomaticas.add(Evaluacion.builder().seccion(seccionGuardada).nombreExamen("Examen Final").pesoPorcentaje(30).fechaExamen(LocalDate.now().plusWeeks(16)).build());
+
+        evaluacionRepository.saveAll(evaluacionesAutomaticas);
+
+        // ==========================================
+        // 2. AUTO-MATRÍCULA DE ALUMNOS EXISTENTES
+        // ==========================================
+        // Buscamos a todos los alumnos que ya pertenecen a la carrera de este nuevo curso
+        List<Alumno> alumnosDeLaCarrera = alumnoRepository.findByCarrera_IdCarrera(curso.getCarrera().getIdCarrera());
+        List<Matricula> nuevasMatriculas = new ArrayList<>();
+        
+        for (Alumno alumno : alumnosDeLaCarrera) {
+            nuevasMatriculas.add(Matricula.builder()
+                    .alumno(alumno)
+                    .seccion(seccionGuardada)
+                    .build());
+        }
+        // Inscribimos a todos los alumnos antiguos en este curso nuevo de un solo golpe
+        matriculaRepository.saveAll(nuevasMatriculas);
+
+        return mapearADto(seccionGuardada);
     }
 
     @Transactional
@@ -88,7 +127,6 @@ public class SeccionService {
         return seccionRepository.findAll().stream().map(this::mapearADto).toList();
     }
 
-    // MÉTODOS RESTAURADOS
     @Transactional(readOnly = true)
     public List<SeccionDTO> listarPorCiclo(String cicloAcademico) {
         return seccionRepository.findByCicloAcademico(cicloAcademico).stream().map(this::mapearADto).toList();
@@ -115,7 +153,7 @@ public class SeccionService {
                 .cicloAcademico(s.getCicloAcademico())
                 .diaSemana(s.getDiaSemana())
                 .horaInicio(s.getHoraInicio().toString()) 
-                .horaFin(s.getHoraFin().toString())       
+                .horaFin(s.getHoraFin().toString())      
                 .modalidad(s.getModalidad().name())
                 .build();
     }

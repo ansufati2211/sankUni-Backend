@@ -26,11 +26,25 @@ public class AlertaAcademicaService {
                         .build()).toList();
     }
     
-    public void resolverAlerta(Long idAlerta) {
-    AlertaAcademica alerta = alertaRepository.findById(idAlerta)
-            .orElseThrow(() -> new ResourceNotFoundException("Alerta no encontrada"));
-    alerta.setResuelta(true);
-    alertaRepository.save(alerta);
-}
+    // 🚀 NUEVO: Método para traer las alertas del docente logueado
+    @Transactional(readOnly = true)
+    public List<AlertaAcademicaDTO> listarPorDocente(Long idDocente) {
+        return alertaRepository.findByDocente_IdDocenteAndResueltaFalse(idDocente).stream()
+                .map(a -> AlertaAcademicaDTO.builder()
+                        .idAlerta(a.getIdAlerta())
+                        .tipo(a.getTipo().name())
+                        .nombreSeccion(a.getSeccion().getCurso().getNombre())
+                        .nombreDocente(a.getDocente().getUsuario().getNombreCompleto())
+                        .mensaje(a.getMensaje())
+                        .resuelta(a.getResuelta())
+                        .fechaCreacion(a.getFechaCreacion())
+                        .build()).toList();
+    }
     
+    public void resolverAlerta(Long idAlerta) {
+        AlertaAcademica alerta = alertaRepository.findById(idAlerta)
+                .orElseThrow(() -> new ResourceNotFoundException("Alerta no encontrada"));
+        alerta.setResuelta(true);
+        alertaRepository.save(alerta);
+    }
 }
