@@ -15,9 +15,14 @@ public class CuotaAlumnoController {
 
     private final CuotaAlumnoService cuotaService;
 
-    // GET /api/v1/cuotas/alumno/1 -> Historial de pagos para la intranet del alumno
+    // Para la intranet del ALUMNO (ya lo tenías)
     @GetMapping("/alumno/{idAlumno}")
     public ResponseEntity<List<CuotaAlumnoDTO>> listarPorAlumno(@PathVariable Long idAlumno) {
         return ResponseEntity.ok(cuotaService.listarPorAlumno(idAlumno));
+    }
+    
+    @GetMapping("/todas")
+    public ResponseEntity<List<CuotaAlumnoDTO>> listarTodas() {
+        return ResponseEntity.ok(cuotaService.listarTodasLasCuotas());
     }
 }

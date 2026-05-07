@@ -11,4 +11,6 @@ public interface CuotaAlumnoRepository extends JpaRepository<CuotaAlumno, Long> 
     
     // Para verificar si tiene deudas antes de matricularlo
     List<CuotaAlumno> findByAlumno_IdAlumnoAndEstado(Long idAlumno, EstadoCuota estado);
+    
+    List<CuotaAlumno> findByEstadoNot(EstadoCuota estado);
 }

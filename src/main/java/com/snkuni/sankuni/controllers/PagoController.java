@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/pagos")
@@ -26,12 +27,15 @@ public class PagoController {
         return ResponseEntity.ok(pagoService.listarPorCuota(idCuota));
     }
 
-    // NUEVO: LA PASARELA DE PAGOS
+    // NUEVO: LA PASARELA DE PAGOS MODIFICADA
     @PostMapping("/pagar")
-    public ResponseEntity<PagoDTO> pagarCuota(
-            @RequestParam Long idCuota, 
-            @RequestParam BigDecimal monto, 
-            @RequestParam String metodoPago) {
+    public ResponseEntity<PagoDTO> pagarCuota(@RequestBody Map<String, Object> payload) { 
+        
+        // Extraemos los datos del Map (Payload)
+        Long idCuota = Long.valueOf(payload.get("idCuota").toString());
+        BigDecimal monto = new BigDecimal(payload.get("monto").toString());
+        String metodoPago = payload.get("metodoPago").toString();
+        
         return ResponseEntity.ok(pagoService.procesarPago(idCuota, monto, metodoPago));
     }
 }

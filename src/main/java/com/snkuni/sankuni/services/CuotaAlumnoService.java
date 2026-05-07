@@ -2,6 +2,7 @@ package com.snkuni.sankuni.services;
 
 import com.snkuni.sankuni.dtos.CuotaAlumnoDTO;
 import com.snkuni.sankuni.models.CuotaAlumno;
+import com.snkuni.sankuni.models.enums.EstadoCuota;
 import com.snkuni.sankuni.repositories.CuotaAlumnoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -31,5 +32,12 @@ public class CuotaAlumnoService {
                 .estado(cuota.getEstado().name())
                 .fechaVencimiento(cuota.getFechaVencimiento())
                 .build();
+    }
+
+    @Transactional(readOnly = true)
+    public List<CuotaAlumnoDTO> listarTodasLasCuotas() {
+        return cuotaRepository.findAll().stream()
+                .map(this::mapearADto)
+                .toList();
     }
 }
