@@ -31,16 +31,36 @@ public class ReporteService {
         return jdbcTemplate.queryForList("SELECT * FROM vw_horario_alumno WHERE id_alumno = ?", idAlumno);
     }
 
-    // NUEVO: Consultas agregadas para el Panel del Admin
+    public List<Map<String, Object>> obtenerHorarioDocente(Long idDocente) {
+        return jdbcTemplate.queryForList("SELECT * FROM vw_horario_docente WHERE id_docente = ?", idDocente);
+    }
+
+    public List<Map<String, Object>> obtenerRendimientoGlobal() {
+        return jdbcTemplate.queryForList("SELECT * FROM vw_rendimiento_alumno");
+    }
+
+    // 🚀 AHORA SÍ: Consulta las 4 métricas reales para el Administrador
     public DashboardAdminDTO obtenerDashboardAdmin() {
         Integer totalAlumnos = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM alumnos", Integer.class);
-        BigDecimal ingresosTotales = jdbcTemplate.queryForObject("SELECT COALESCE(SUM(monto_pagado), 0) FROM pagos", BigDecimal.class);
-        Integer morosos = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM cuotas_alumno WHERE estado = 'VENCIDO'", Integer.class);
+        Integer totalDocentes = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM docentes", Integer.class);
+        // Suma de pagos del mes actual
+        BigDecimal ingresosMes = jdbcTemplate.queryForObject(
+            "SELECT COALESCE(SUM(monto_pagado), 0) FROM pagos WHERE EXTRACT(MONTH FROM fecha_pago) = EXTRACT(MONTH FROM CURRENT_DATE)", 
+            BigDecimal.class);
+        Integer pendientes = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM solicitudes WHERE estado = 'PENDIENTE'", Integer.class);
 
         return DashboardAdminDTO.builder()
                 .totalAlumnos(totalAlumnos != null ? totalAlumnos : 0)
-                .ingresosTotales(ingresosTotales != null ? ingresosTotales : BigDecimal.ZERO)
-                .cuotasVencidas(morosos != null ? morosos : 0)
+                .totalDocentes(totalDocentes != null ? totalDocentes : 0)
+                .ingresosMes(ingresosMes != null ? ingresosMes : BigDecimal.ZERO)
+                .solicitudesPendientes(pendientes != null ? pendientes : 0)
                 .build();
+    }
+
+    public List<Map<String, Object>> obtenerEvolucionMatriculas() {
+        // Trae los últimos 7 meses con matrículas reales
+        String sql = "SELECT TO_CHAR(fecha_matricula, 'YYYY-MM') as mes, COUNT(*) as total " +
+                     "FROM matriculas GROUP BY TO_CHAR(fecha_matricula, 'YYYY-MM') ORDER BY mes ASC LIMIT 7";
+        return jdbcTemplate.queryForList(sql);
     }
 }

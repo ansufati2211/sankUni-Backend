@@ -1,8 +1,13 @@
 package com.snkuni.sankuni.controllers;
 
 import com.snkuni.sankuni.dtos.AlumnoDTO;
+import com.snkuni.sankuni.dtos.PostulanteDTO;
 import com.snkuni.sankuni.services.AlumnoService;
+
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,4 +40,9 @@ public class AlumnoController {
     public ResponseEntity<AlumnoDTO> buscarPorDni(@PathVariable String dni) {
         return ResponseEntity.ok(alumnoService.buscarPorDni(dni));
     }
+
+    @PostMapping("/registro-manual")
+public ResponseEntity<AlumnoDTO> registroManual(@RequestBody @Valid PostulanteDTO dto) {
+    return new ResponseEntity<>(alumnoService.registroManual(dto), HttpStatus.CREATED);
+}
 }

@@ -3,12 +3,12 @@ package com.snkuni.sankuni.controllers;
 import com.snkuni.sankuni.dtos.SolicitudDTO;
 import com.snkuni.sankuni.dtos.SolicitudRequestDTO;
 import com.snkuni.sankuni.services.SolicitudService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/solicitudes")
@@ -17,28 +17,24 @@ public class SolicitudController {
 
     private final SolicitudService solicitudService;
 
+    // 🚀 MÉTODO POST PARA CREAR (EL QUE FALTABA)
     @PostMapping
-    public ResponseEntity<SolicitudDTO> crear(@Valid @RequestBody SolicitudRequestDTO request) {
+    public ResponseEntity<SolicitudDTO> crearSolicitud(@RequestBody SolicitudRequestDTO request) {
         return ResponseEntity.ok(solicitudService.crearSolicitud(request));
     }
 
-    @GetMapping("/usuario/{id}")
-    public ResponseEntity<List<SolicitudDTO>> listarMisSolicitudes(@PathVariable("id") Long id) {
-        return ResponseEntity.ok(solicitudService.listarMisSolicitudes(id));
+    @GetMapping("/mis-solicitudes/{idUsuario}")
+    public ResponseEntity<List<SolicitudDTO>> listarMisSolicitudes(@PathVariable Long idUsuario) {
+        return ResponseEntity.ok(solicitudService.listarMisSolicitudes(idUsuario));
     }
 
-    // NUEVO: Ver todos los trámites (Admin)
-    @GetMapping
-    public ResponseEntity<List<SolicitudDTO>> listarTodas() {
-        return ResponseEntity.ok(solicitudService.listarTodas());
+    @GetMapping("/pendientes")
+    public ResponseEntity<List<SolicitudDTO>> listarPendientes() {
+        return ResponseEntity.ok(solicitudService.listarPendientes());
     }
 
-    // NUEVO: Responder trámite (Admin)
     @PutMapping("/{id}/responder")
-    public ResponseEntity<SolicitudDTO> responderSolicitud(
-            @PathVariable Long id, 
-            @RequestParam String estado, 
-            @RequestParam String observacion) {
-        return ResponseEntity.ok(solicitudService.responderSolicitud(id, estado, observacion));
+    public ResponseEntity<SolicitudDTO> responderSolicitud(@PathVariable Long id, @RequestBody Map<String, String> body) {
+        return ResponseEntity.ok(solicitudService.responderSolicitud(id, body.get("estado"), body.get("observacion")));
     }
 }

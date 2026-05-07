@@ -4,6 +4,7 @@ import com.snkuni.sankuni.dtos.CarreraDTO;
 import com.snkuni.sankuni.models.Carrera;
 import com.snkuni.sankuni.models.enums.TipoPrograma;
 import com.snkuni.sankuni.repositories.CarreraRepository;
+import com.snkuni.sankuni.exceptions.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,7 +27,6 @@ public class CarreraService {
     @Transactional
     public CarreraDTO crearCarrera(CarreraDTO dto) {
         Carrera nuevaCarrera = Carrera.builder()
-                // Convertimos el String del DTO al Enum, si es nulo por defecto es CARRERA
                 .tipo(dto.getTipo() != null ? TipoPrograma.valueOf(dto.getTipo()) : TipoPrograma.CARRERA)
                 .nombre(dto.getNombre())
                 .descripcion(dto.getDescripcion())
@@ -34,7 +34,8 @@ public class CarreraService {
                 .mercadoLaboral(dto.getMercadoLaboral())
                 .beneficios(dto.getBeneficios())
                 .requisitos(dto.getRequisitos())
-                .estado(true)
+                // Toma el estado del Frontend, si no lo mandan, por defecto es true (Activo)
+                .estado(dto.getEstado() != null ? dto.getEstado() : true)
                 .build();
 
         Carrera guardada = carreraRepository.save(nuevaCarrera);
@@ -42,7 +43,27 @@ public class CarreraService {
         return dto;
     }
 
-    // Mapeo completo para la página web pública
+    // EL NUEVO MÉTODO DE EDICIÓN CON ESTADO
+    @Transactional
+    public CarreraDTO editarCarrera(Long id, CarreraDTO dto) {
+        Carrera carrera = carreraRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Programa no encontrado"));
+
+        carrera.setTipo(TipoPrograma.valueOf(dto.getTipo()));
+        carrera.setNombre(dto.getNombre());
+        carrera.setDescripcion(dto.getDescripcion());
+        carrera.setPerfilAcademico(dto.getPerfilAcademico());
+        carrera.setMercadoLaboral(dto.getMercadoLaboral());
+        carrera.setBeneficios(dto.getBeneficios());
+        carrera.setRequisitos(dto.getRequisitos());
+        
+        if (dto.getEstado() != null) {
+            carrera.setEstado(dto.getEstado());
+        }
+
+        return mapearADto(carreraRepository.save(carrera));
+    }
+
     private CarreraDTO mapearADto(Carrera carrera) {
         return CarreraDTO.builder()
                 .idCarrera(carrera.getIdCarrera())

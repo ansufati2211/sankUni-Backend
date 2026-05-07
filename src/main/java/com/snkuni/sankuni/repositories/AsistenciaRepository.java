@@ -7,11 +7,12 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-
+import java.time.LocalDate;
+import java.util.List;
 
 @Repository
 public interface AsistenciaRepository extends JpaRepository<Asistencia, Long> {
-
+    
     @Modifying
     @Query(value = "CALL sp_registrar_asistencia(:p_seccion_id, :p_alumno_id, :p_presente)", nativeQuery = true)
     void registrarAsistenciaMasiva(
@@ -19,4 +20,6 @@ public interface AsistenciaRepository extends JpaRepository<Asistencia, Long> {
             @Param("p_alumno_id") Long alumnoId, 
             @Param("p_presente") Boolean presente
     );
+
+    List<Asistencia> findBySeccion_IdSeccionAndFecha(Long seccionId, LocalDate fecha);
 }
