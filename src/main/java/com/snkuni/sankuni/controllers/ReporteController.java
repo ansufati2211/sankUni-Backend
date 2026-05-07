@@ -36,7 +36,6 @@ public class ReporteController {
         return ResponseEntity.ok(reporteService.obtenerHorarioAlumno(alumnoId));
     }
 
-    // ¡NUEVO! Endpoint para cargar los cursos y alumnos del Docente
     @GetMapping("/horario-docente/{docenteId}")
     public ResponseEntity<List<Map<String, Object>>> getHorarioDocente(@PathVariable("docenteId") Long docenteId) {
         return ResponseEntity.ok(reporteService.obtenerHorarioDocente(docenteId));
@@ -50,5 +49,11 @@ public class ReporteController {
     @GetMapping("/rendimiento")
     public ResponseEntity<List<Map<String, Object>>> getRendimientoGlobal() {
         return ResponseEntity.ok(reporteService.obtenerRendimientoGlobal());
+    }
+
+    // 🚀 NUEVO: Puerta de acceso para descargar la data del Gráfico
+    @GetMapping("/matriculas-chart")
+    public ResponseEntity<List<Map<String, Object>>> getMatriculasChart() {
+        return ResponseEntity.ok(reporteService.obtenerEvolucionMatriculas());
     }
 }

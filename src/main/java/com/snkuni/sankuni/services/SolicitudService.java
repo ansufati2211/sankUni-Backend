@@ -26,18 +26,25 @@ public class SolicitudService {
     private final UsuarioRepository usuarioRepository;
     private final SeccionRepository seccionRepository;
 
+    // 🚀 MÉTODO PARA CREAR (EL QUE FALTABA)
     @Transactional
     public SolicitudDTO crearSolicitud(SolicitudRequestDTO request) {
         Usuario emisor = usuarioRepository.findById(request.getEmisorId())
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
+
         Seccion seccion = null;
         if (request.getSeccionId() != null) {
             seccion = seccionRepository.findById(request.getSeccionId()).orElse(null);
         }
+
         Solicitud solicitud = Solicitud.builder()
-                .emisor(emisor).tipo(TipoSolicitud.valueOf(request.getTipo()))
-                .seccion(seccion).descripcion(request.getDescripcion())
-                .estado(RequestStatus.PENDIENTE).build();
+                .emisor(emisor)
+                .tipo(TipoSolicitud.valueOf(request.getTipo()))
+                .seccion(seccion)
+                .descripcion(request.getDescripcion())
+                .estado(RequestStatus.PENDIENTE)
+                .build();
+
         return mapearADTO(solicitudRepository.save(solicitud));
     }
 
@@ -46,29 +53,32 @@ public class SolicitudService {
         return solicitudRepository.findByEmisor_IdUsuario(idUsuario).stream().map(this::mapearADTO).toList();
     }
 
-    // NUEVO: Para el panel del ADMIN (Todos los trámites)
     @Transactional(readOnly = true)
     public List<SolicitudDTO> listarTodas() {
         return solicitudRepository.findAll().stream().map(this::mapearADTO).toList();
     }
 
-    // NUEVO: Para que el ADMIN acepte o rechace
+    @Transactional(readOnly = true)
+    public List<SolicitudDTO> listarPendientes() {
+        return solicitudRepository.findAll().stream()
+                .filter(s -> s.getEstado() == RequestStatus.PENDIENTE)
+                .map(this::mapearADTO).toList();
+    }
+
     @Transactional
     public SolicitudDTO responderSolicitud(Long idSolicitud, String estado, String observacion) {
         Solicitud s = solicitudRepository.findById(idSolicitud)
-                .orElseThrow(() -> new ResourceNotFoundException("Trámite no encontrado"));
-        
+                .orElseThrow(() -> new ResourceNotFoundException("Solicitud no encontrada"));
         s.setEstado(RequestStatus.valueOf(estado.toUpperCase()));
         s.setObservacionCoordinador(observacion);
         s.setFechaRespuesta(LocalDateTime.now());
-        
         return mapearADTO(solicitudRepository.save(s));
     }
 
     private SolicitudDTO mapearADTO(Solicitud s) {
         return SolicitudDTO.builder()
                 .idSolicitud(s.getIdSolicitud())
-                .nombreEmisor(s.getEmisor().getNombreCompleto())
+                .nombreEmisor(s.getEmisor().getNombres() + " " + s.getEmisor().getApellidos())
                 .tipo(s.getTipo().name())
                 .cursoYSeccion(s.getSeccion() != null ? s.getSeccion().getCurso().getNombre() : "N/A")
                 .descripcion(s.getDescripcion())
