@@ -51,9 +51,13 @@ public class ReporteController {
         return ResponseEntity.ok(reporteService.obtenerRendimientoGlobal());
     }
 
-    // 🚀 NUEVO: Puerta de acceso para descargar la data del Gráfico
     @GetMapping("/matriculas-chart")
     public ResponseEntity<List<Map<String, Object>>> getMatriculasChart() {
         return ResponseEntity.ok(reporteService.obtenerEvolucionMatriculas());
+    }
+
+    @GetMapping("/semaforo-global")
+    public ResponseEntity<List<Map<String, Object>>> getSemaforoGlobal() {
+        return ResponseEntity.ok(reporteService.obtenerSemaforoGlobal());
     }
 }

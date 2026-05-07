@@ -38,6 +38,9 @@ public class ReporteService {
     public List<Map<String, Object>> obtenerRendimientoGlobal() {
         return jdbcTemplate.queryForList("SELECT * FROM vw_rendimiento_alumno");
     }
+    public List<Map<String, Object>> obtenerSemaforoGlobal() {
+        return jdbcTemplate.queryForList("SELECT * FROM vw_semaforo_notas");
+    }
 
     // 🚀 AHORA SÍ: Consulta las 4 métricas reales para el Administrador
     public DashboardAdminDTO obtenerDashboardAdmin() {
