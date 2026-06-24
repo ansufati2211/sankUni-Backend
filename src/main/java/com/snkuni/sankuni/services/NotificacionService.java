@@ -22,11 +22,12 @@ public class NotificacionService {
     private final SolicitudRepository solicitudRepo;
     private final AlertaAcademicaRepository alertaRepo;
     private final MensajeContactoRepository mensajeRepo;
+    private final MatriculaRepository matriculaRepo;
 
     public List<NotificacionDTO> obtenerNotificacionesAdmin() {
         List<NotificacionDTO> notificaciones = new ArrayList<>();
 
-        // 1. Nuevos Postulantes (Optimizada con findByEstado)
+        // 1. Nuevos Postulantes
         notificaciones.addAll(postulanteRepo.findByEstado(EstadoPostulante.EN_REVISION).stream()
                 .map(p -> NotificacionDTO.builder()
                         .idOrigen(p.getIdPostulante())
@@ -38,7 +39,7 @@ public class NotificacionService {
                         .build())
                 .collect(Collectors.toList()));
 
-        // 2. Trámites SAE (Optimizada con findByEstado)
+        // 2. Trámites SAE
         notificaciones.addAll(solicitudRepo.findByEstado(RequestStatus.PENDIENTE).stream()
                 .map(s -> NotificacionDTO.builder()
                         .idOrigen(s.getIdSolicitud())
@@ -50,19 +51,19 @@ public class NotificacionService {
                         .build())
                 .collect(Collectors.toList()));
 
-        // 3. Alertas Académicas (Optimizada con findByResueltaFalse)
+        // 3. Alertas Académicas
         notificaciones.addAll(alertaRepo.findByResueltaFalse().stream()
                 .map(a -> NotificacionDTO.builder()
                         .idOrigen(a.getIdAlerta())
                         .tipo("ALERTA")
                         .titulo("Alerta Académica")
-                        .desc(a.getMensaje()) 
+                        .desc(a.getMensaje())
                         .fecha(a.getFechaCreacion())
                         .tiempo(calcularTiempo(a.getFechaCreacion()))
                         .build())
                 .collect(Collectors.toList()));
 
-        // 4. Mensajes Web (Optimizada con findByEstadoAtencionFalse)
+        // 4. Mensajes Web
         notificaciones.addAll(mensajeRepo.findByEstadoAtencionFalse().stream()
                 .map(m -> NotificacionDTO.builder()
                         .idOrigen(m.getIdMensaje())
@@ -74,10 +75,51 @@ public class NotificacionService {
                         .build())
                 .collect(Collectors.toList()));
 
-        // ORDENAR TODAS LAS NOTIFICACIONES (De la más reciente a la más antigua) y limitar a 20
+        // 5. Nuevas Matrículas (últimos 30 días)
+        notificaciones.addAll(buildMatriculaNotifs(30));
+
         return notificaciones.stream()
                 .sorted(Comparator.comparing(NotificacionDTO::getFecha).reversed())
-                .limit(20) // Limitamos a 20 para no saturar la UI visualmente
+                .limit(20)
+                .collect(Collectors.toList());
+    }
+
+    public List<NotificacionDTO> obtenerNotificacionesCoordinador() {
+        List<NotificacionDTO> notificaciones = new ArrayList<>();
+
+        // Alertas académicas pendientes
+        notificaciones.addAll(alertaRepo.findByResueltaFalse().stream()
+                .map(a -> NotificacionDTO.builder()
+                        .idOrigen(a.getIdAlerta())
+                        .tipo("ALERTA")
+                        .titulo("Alerta Académica")
+                        .desc(a.getMensaje())
+                        .fecha(a.getFechaCreacion())
+                        .tiempo(calcularTiempo(a.getFechaCreacion()))
+                        .build())
+                .collect(Collectors.toList()));
+
+        // Nuevas matrículas (últimos 30 días)
+        notificaciones.addAll(buildMatriculaNotifs(30));
+
+        return notificaciones.stream()
+                .sorted(Comparator.comparing(NotificacionDTO::getFecha).reversed())
+                .limit(20)
+                .collect(Collectors.toList());
+    }
+
+    private List<NotificacionDTO> buildMatriculaNotifs(int dias) {
+        return matriculaRepo.findMatriculasRecientes(LocalDateTime.now().minusDays(dias)).stream()
+                .map(m -> NotificacionDTO.builder()
+                        .idOrigen(m.getIdMatricula())
+                        .tipo("MATRICULA")
+                        .titulo("Nueva Matrícula")
+                        .desc(m.getAlumno().getUsuario().getNombreCompleto()
+                                + " se matriculó en: " + m.getSeccion().getCurso().getNombre()
+                                + " (" + m.getSeccion().getCicloAcademico() + ")")
+                        .fecha(m.getFechaMatricula())
+                        .tiempo(calcularTiempo(m.getFechaMatricula()))
+                        .build())
                 .collect(Collectors.toList());
     }
 

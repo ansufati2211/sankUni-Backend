@@ -21,4 +21,9 @@ public class NotificacionController {
     public ResponseEntity<List<NotificacionDTO>> obtenerNotificacionesAdmin() {
         return ResponseEntity.ok(notificacionService.obtenerNotificacionesAdmin());
     }
+
+    @GetMapping("/coordinador")
+    public ResponseEntity<List<NotificacionDTO>> obtenerNotificacionesCoordinador() {
+        return ResponseEntity.ok(notificacionService.obtenerNotificacionesCoordinador());
+    }
 }
