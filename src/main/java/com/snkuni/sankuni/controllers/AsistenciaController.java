@@ -32,4 +32,9 @@ public class AsistenciaController {
             @PathVariable String fecha) {
         return ResponseEntity.ok(asistenciaService.obtenerPorSeccionYFecha(idSeccion, LocalDate.parse(fecha)));
     }
+
+    @GetMapping("/alumno/{alumnoId}")
+    public ResponseEntity<List<AsistenciaDTO>> obtenerPorAlumno(@PathVariable Long alumnoId) {
+        return ResponseEntity.ok(asistenciaService.obtenerPorAlumno(alumnoId));
+    }
 }

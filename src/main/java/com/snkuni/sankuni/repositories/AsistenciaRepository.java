@@ -22,4 +22,11 @@ public interface AsistenciaRepository extends JpaRepository<Asistencia, Long> {
     );
 
     List<Asistencia> findBySeccion_IdSeccionAndFecha(Long seccionId, LocalDate fecha);
+
+    @Query("SELECT a FROM Asistencia a " +
+           "JOIN FETCH a.seccion s " +
+           "JOIN FETCH s.curso c " +
+           "WHERE a.alumno.idAlumno = :alumnoId " +
+           "ORDER BY a.fecha DESC")
+    List<Asistencia> findByAlumnoId(@Param("alumnoId") Long alumnoId);
 }
