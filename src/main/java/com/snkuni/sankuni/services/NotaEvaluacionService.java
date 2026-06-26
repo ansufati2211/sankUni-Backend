@@ -69,4 +69,27 @@ public class NotaEvaluacionService {
                         .build())
                 .toList();
     }
+
+    @Transactional(readOnly = true)
+    public List<NotaEvaluacionDTO> obtenerNotasPorAlumno(Long alumnoId) {
+        return notaRepository.findByAlumnoId(alumnoId).stream()
+                .map(n -> {
+                    var ev = n.getEvaluacion();
+                    var sec = ev.getSeccion();
+                    return NotaEvaluacionDTO.builder()
+                            .idNota(n.getIdNota())
+                            .evaluacionId(ev.getIdEvaluacion())
+                            .alumnoId(n.getAlumno().getIdAlumno())
+                            .nota(n.getNota())
+                            .fechaRegistro(n.getFechaRegistro())
+                            .nombreExamen(ev.getNombreExamen())
+                            .pesoPorcentaje(ev.getPesoPorcentaje())
+                            .fechaExamen(ev.getFechaExamen())
+                            .nombreCurso(sec.getCurso().getNombre())
+                            .seccionId(sec.getIdSeccion())
+                            .cicloAcademico(sec.getCicloAcademico())
+                            .build();
+                })
+                .toList();
+    }
 }

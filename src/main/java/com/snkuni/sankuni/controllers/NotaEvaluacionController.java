@@ -25,4 +25,9 @@ public class NotaEvaluacionController {
     public ResponseEntity<List<NotaEvaluacionDTO>> obtenerNotas(@PathVariable Long idEvaluacion) {
         return ResponseEntity.ok(notaService.obtenerNotasPorEvaluacion(idEvaluacion));
     }
+
+    @GetMapping("/alumno/{alumnoId}")
+    public ResponseEntity<List<NotaEvaluacionDTO>> obtenerNotasPorAlumno(@PathVariable Long alumnoId) {
+        return ResponseEntity.ok(notaService.obtenerNotasPorAlumno(alumnoId));
+    }
 }
