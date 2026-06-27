@@ -37,4 +37,21 @@ public class AsistenciaService {
                         .build())
                 .toList();
     }
+
+    @Transactional(readOnly = true)
+    public List<AsistenciaDTO> obtenerPorAlumno(Long alumnoId) {
+        return asistenciaRepository.findByAlumnoId(alumnoId).stream()
+                .map(a -> {
+                    var sec = a.getSeccion();
+                    return AsistenciaDTO.builder()
+                            .alumnoId(alumnoId)
+                            .presente(a.getPresente())
+                            .fecha(a.getFecha())
+                            .nombreCurso(sec.getCurso().getNombre())
+                            .seccionId(sec.getIdSeccion())
+                            .cicloAcademico(sec.getCicloAcademico())
+                            .build();
+                })
+                .toList();
+    }
 }

@@ -143,6 +143,14 @@ public class SeccionService {
                 .map(this::mapearADto).toList();
     }
 
+    @Transactional
+    public void eliminarSeccion(Long id) {
+        if (!seccionRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Sección no encontrada");
+        }
+        seccionRepository.deleteById(id);
+    }
+
     private SeccionDTO mapearADto(Seccion s) {
         return SeccionDTO.builder()
                 .idSeccion(s.getIdSeccion())

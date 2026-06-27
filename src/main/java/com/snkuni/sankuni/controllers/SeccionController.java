@@ -47,4 +47,10 @@ public class SeccionController {
     public ResponseEntity<SeccionDTO> editarSeccion(@PathVariable Long id, @Valid @RequestBody SeccionDTO dto) {
         return ResponseEntity.ok(seccionService.editarSeccion(id, dto));
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> eliminarSeccion(@PathVariable Long id) {
+        seccionService.eliminarSeccion(id);
+        return ResponseEntity.noContent().build();
+    }
 }
