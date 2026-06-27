@@ -1,7 +1,7 @@
 package com.snkuni.sankuni.controllers;
 
 import com.snkuni.sankuni.dtos.ApiResponseDTO;
-import com.snkuni.sankuni.dtos.AsistenciaDTO; // <-- Importación
+import com.snkuni.sankuni.dtos.AsistenciaDTO;
 import com.snkuni.sankuni.dtos.AsistenciaRequestDTO;
 import com.snkuni.sankuni.services.AsistenciaService;
 import jakarta.validation.Valid;

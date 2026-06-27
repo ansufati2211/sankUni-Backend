@@ -31,11 +31,9 @@ public class NotaEvaluacionService {
         Alumno alumno = alumnoRepository.findById(dto.getAlumnoId())
                 .orElseThrow(() -> new ResourceNotFoundException("Alumno no encontrado"));
 
-        // Buscamos si la nota ya existe
         NotaEvaluacion nota = notaRepository.findByEvaluacion_IdEvaluacionAndAlumno_IdAlumno(evaluacion.getIdEvaluacion(), alumno.getIdAlumno())
                 .orElse(null);
 
-        // Si no existe, creamos el molde vacío
         if (nota == null) {
             nota = NotaEvaluacion.builder()
                     .evaluacion(evaluacion)
@@ -43,7 +41,6 @@ public class NotaEvaluacionService {
                     .build();
         }
 
-        // Le asignamos el valor de la nota
         nota.setNota(dto.getNota());
         nota.setFechaRegistro(LocalDateTime.now());
         
@@ -75,19 +72,21 @@ public class NotaEvaluacionService {
         return notaRepository.findByAlumnoId(alumnoId).stream()
                 .map(n -> {
                     var ev = n.getEvaluacion();
-                    var sec = ev.getSeccion();
+                    var sec = (ev != null) ? ev.getSeccion() : null;
+                    String nombreCurso = (sec != null && sec.getCurso() != null) ? sec.getCurso().getNombre() : "Curso Desconocido";
+                    
                     return NotaEvaluacionDTO.builder()
                             .idNota(n.getIdNota())
-                            .evaluacionId(ev.getIdEvaluacion())
+                            .evaluacionId(ev != null ? ev.getIdEvaluacion() : null)
                             .alumnoId(n.getAlumno().getIdAlumno())
                             .nota(n.getNota())
                             .fechaRegistro(n.getFechaRegistro())
-                            .nombreExamen(ev.getNombreExamen())
-                            .pesoPorcentaje(ev.getPesoPorcentaje())
-                            .fechaExamen(ev.getFechaExamen())
-                            .nombreCurso(sec.getCurso().getNombre())
-                            .seccionId(sec.getIdSeccion())
-                            .cicloAcademico(sec.getCicloAcademico())
+                            .nombreExamen(ev != null ? ev.getNombreExamen() : "Sin Nombre")
+                            .pesoPorcentaje(ev != null ? ev.getPesoPorcentaje() : 0)
+                            .fechaExamen(ev != null ? ev.getFechaExamen() : null)
+                            .nombreCurso(nombreCurso)
+                            .seccionId(sec != null ? sec.getIdSeccion() : null)
+                            .cicloAcademico(sec != null ? sec.getCicloAcademico() : "Desconocido")
                             .build();
                 })
                 .toList();

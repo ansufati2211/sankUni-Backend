@@ -1,6 +1,6 @@
 package com.snkuni.sankuni.services;
 
-import com.snkuni.sankuni.dtos.AsistenciaDTO; // <-- Agrega esta importación
+import com.snkuni.sankuni.dtos.AsistenciaDTO;
 import com.snkuni.sankuni.dtos.AsistenciaRequestDTO;
 import com.snkuni.sankuni.exceptions.BusinessLogicException;
 import com.snkuni.sankuni.repositories.AsistenciaRepository;
@@ -43,13 +43,15 @@ public class AsistenciaService {
         return asistenciaRepository.findByAlumnoId(alumnoId).stream()
                 .map(a -> {
                     var sec = a.getSeccion();
+                    String nombreCurso = (sec != null && sec.getCurso() != null) ? sec.getCurso().getNombre() : "Curso Desconocido";
+                    
                     return AsistenciaDTO.builder()
                             .alumnoId(alumnoId)
                             .presente(a.getPresente())
                             .fecha(a.getFecha())
-                            .nombreCurso(sec.getCurso().getNombre())
-                            .seccionId(sec.getIdSeccion())
-                            .cicloAcademico(sec.getCicloAcademico())
+                            .nombreCurso(nombreCurso)
+                            .seccionId(sec != null ? sec.getIdSeccion() : null)
+                            .cicloAcademico(sec != null ? sec.getCicloAcademico() : "Desconocido")
                             .build();
                 })
                 .toList();
