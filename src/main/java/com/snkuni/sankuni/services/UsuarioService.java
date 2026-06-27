@@ -18,6 +18,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.dao.DataIntegrityViolationException;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 @RequiredArgsConstructor
@@ -26,7 +29,11 @@ public class UsuarioService {
     private final UsuarioRepository usuarioRepository;
     private final DocenteRepository docenteRepository;
     private final AlumnoRepository alumnoRepository;
-    private final PasswordEncoder passwordEncoder; 
+    private final PasswordEncoder passwordEncoder;
+    private final EmailService emailService;
+
+    // Mapa temporal para guardar los códigos de seguridad en memoria (ID Usuario -> Código)
+    private final Map<Long, String> codigosSeguridad = new ConcurrentHashMap<>();
 
     @Transactional(readOnly = true)
     public List<UsuarioDTO> listarTodosLosUsuarios() {
@@ -49,23 +56,16 @@ public class UsuarioService {
             Usuario usuarioGuardado = usuarioRepository.save(usuario);
 
             if (rolAsignado == UserRole.DOCENTE) {
-                Docente docente = Docente.builder()
-                        .usuario(usuarioGuardado)
-                        .estado(TeacherStatus.ACTIVO).build();
+                Docente docente = Docente.builder().usuario(usuarioGuardado).estado(TeacherStatus.ACTIVO).build();
                 docenteRepository.save(docente);
             } else if (rolAsignado == UserRole.ALUMNO) {
-                Alumno alumno = Alumno.builder()
-                        .usuario(usuarioGuardado)
-                        .estado(StudentStatus.ACTIVO).build();
+                Alumno alumno = Alumno.builder().usuario(usuarioGuardado).estado(StudentStatus.ACTIVO).build();
                 alumnoRepository.save(alumno);
             }
-            
             return mapearADto(usuarioGuardado);
-            
         } catch (DataIntegrityViolationException e) {
             throw new BusinessLogicException("El DNI o Correo ingresado ya se encuentra registrado.");
         } catch (Exception e) {
-            e.printStackTrace();
             throw new BusinessLogicException("Fallo en la base de datos al crear: " + e.getMessage());
         }
     }
@@ -73,21 +73,15 @@ public class UsuarioService {
     @Transactional
     public UsuarioDTO actualizarUsuario(Long id, UsuarioDTO dto) {
         try {
-            Usuario usuario = usuarioRepository.findById(id)
-                    .orElseThrow(() -> new BusinessLogicException("Usuario no encontrado"));
-                    
+            Usuario usuario = usuarioRepository.findById(id).orElseThrow(() -> new BusinessLogicException("Usuario no encontrado"));
             usuario.setDni(dto.getDni().trim());
             usuario.setNombres(dto.getNombres().trim());
             usuario.setApellidos(dto.getApellidos().trim());
             usuario.setEmail(dto.getEmail().trim());
-            // PROTECCIÓN: Ya NO actualizamos el rol aquí para evitar corrupción entre tablas.
-            
             return mapearADto(usuarioRepository.save(usuario));
-            
         } catch (DataIntegrityViolationException e) {
             throw new BusinessLogicException("El DNI o Correo modificado choca con el de otro usuario.");
         } catch (Exception e) {
-            e.printStackTrace();
             throw new BusinessLogicException("Fallo en la BD al actualizar: " + e.getMessage());
         }
     }
@@ -97,12 +91,40 @@ public class UsuarioService {
         try {
             usuarioRepository.deleteById(id);
         } catch (DataIntegrityViolationException e) {
-            throw new BusinessLogicException("No se puede eliminar: El usuario tiene notas, asistencias o trámites registrados.");
+            throw new BusinessLogicException("No se puede eliminar: El usuario tiene registros asociados.");
         } catch (Exception e) {
             throw new BusinessLogicException("Fallo al eliminar: " + e.getMessage());
         }
     }
     
+    // --- LÓGICA NUEVA DE SEGURIDAD Y CORREOS ---
+
+    public void generarYEnviarCodigo(Long idUsuario) {
+        Usuario usuario = usuarioRepository.findById(idUsuario).orElseThrow(() -> new BusinessLogicException("Usuario no encontrado"));
+        String codigoAleatorio = String.format("%06d", new Random().nextInt(999999));
+        codigosSeguridad.put(idUsuario, codigoAleatorio);
+        emailService.enviarCorreoSeguridad(usuario.getEmail(), codigoAleatorio);
+    }
+
+    public void verificarCodigo(Long idUsuario, String codigoIngresado) {
+        String codigoGuardado = codigosSeguridad.get(idUsuario);
+        if (codigoGuardado == null || !codigoGuardado.equals(codigoIngresado)) {
+            throw new BusinessLogicException("El código es incorrecto o ha expirado.");
+        }
+        codigosSeguridad.remove(idUsuario); // Consumir el código para que no se re-use
+    }
+
+    @Transactional
+    public void actualizarPassword(Long id, String nuevaPassword) {
+        try {
+            Usuario usuario = usuarioRepository.findById(id).orElseThrow(() -> new BusinessLogicException("Usuario no encontrado"));
+            usuario.setPasswordHash(passwordEncoder.encode(nuevaPassword));
+            usuarioRepository.save(usuario);
+        } catch (Exception e) {
+            throw new BusinessLogicException("Fallo al actualizar la contraseña: " + e.getMessage());
+        }
+    }
+
     private UsuarioDTO mapearADto(Usuario usuario) {
         return UsuarioDTO.builder()
                 .idUsuario(usuario.getIdUsuario())

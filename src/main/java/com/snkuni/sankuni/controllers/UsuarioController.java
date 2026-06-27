@@ -49,4 +49,35 @@ public class UsuarioController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+    
+    @PutMapping("/{id}/password")
+    public ResponseEntity<?> actualizarPassword(@PathVariable Long id, @RequestBody java.util.Map<String, String> body) {
+        try {
+            String nuevaPassword = body.get("nuevaPassword");
+            usuarioService.actualizarPassword(id, nuevaPassword);
+            return ResponseEntity.ok().build();
+        } catch (BusinessLogicException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/{id}/enviar-codigo")
+    public ResponseEntity<?> enviarCodigo(@PathVariable Long id) {
+        try {
+            usuarioService.generarYEnviarCodigo(id);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/{id}/verificar-codigo")
+    public ResponseEntity<?> verificarCodigo(@PathVariable Long id, @RequestBody java.util.Map<String, String> body) {
+        try {
+            usuarioService.verificarCodigo(id, body.get("codigo"));
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 }
