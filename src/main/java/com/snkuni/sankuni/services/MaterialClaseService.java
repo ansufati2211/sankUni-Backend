@@ -65,7 +65,13 @@ public class MaterialClaseService {
         return new ArchivoDescarga(recurso, material.getTitulo(), material.getArchivoUrl());
     }
 
-
+    @Transactional
+    public void eliminar(Long idMaterial) {
+        MaterialClase material = materialRepository.findById(idMaterial)
+                .orElseThrow(() -> new ResourceNotFoundException("Material no encontrado"));
+        materialRepository.delete(material);
+        storageService.delete(material.getArchivoUrl());
+    }
 
     private ModuloCurso resolverModulo(Long idModulo, Seccion seccion) {
         if (idModulo == null) {

@@ -5,6 +5,8 @@ import com.snkuni.sankuni.exceptions.ResourceNotFoundException;
 import com.snkuni.sankuni.models.Curso;
 import com.snkuni.sankuni.models.ModuloCurso;
 import com.snkuni.sankuni.repositories.CursoRepository;
+import com.snkuni.sankuni.repositories.EvaluacionRepository;
+import com.snkuni.sankuni.repositories.MaterialClaseRepository;
 import com.snkuni.sankuni.repositories.ModuloCursoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,6 +20,8 @@ public class ModuloCursoService {
 
     private final ModuloCursoRepository moduloRepository;
     private final CursoRepository cursoRepository;
+    private final MaterialClaseRepository materialRepository;
+    private final EvaluacionRepository evaluacionRepository;
 
     @Transactional
     public ModuloCursoDTO crear(ModuloCursoDTO dto) {
@@ -56,10 +60,21 @@ public class ModuloCursoService {
 
     @Transactional
     public void eliminar(Long id) {
-        if (!moduloRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Módulo no encontrado");
-        }
-        moduloRepository.deleteById(id);
+        ModuloCurso modulo = moduloRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Módulo no encontrado"));
+
+        // Vaciar el módulo: el material y las evaluaciones no se borran, solo quedan
+        // sin agrupar (moduloId = null). Así eliminar un módulo nunca falla por tener
+        // contenido cargado, ni destruye archivos o evaluaciones que ya tengan notas.
+        var materiales = materialRepository.findByModulo_IdModulo(id);
+        materiales.forEach(m -> m.setModulo(null));
+        materialRepository.saveAll(materiales);
+
+        var evaluaciones = evaluacionRepository.findByModulo_IdModulo(id);
+        evaluaciones.forEach(e -> e.setModulo(null));
+        evaluacionRepository.saveAll(evaluaciones);
+
+        moduloRepository.delete(modulo);
     }
 
     private ModuloCursoDTO mapearADto(ModuloCurso m) {

@@ -31,4 +31,10 @@ public class EvaluacionController {
     public ResponseEntity<List<EvaluacionDTO>> listarPorModulo(@PathVariable Long idModulo) {
         return ResponseEntity.ok(evaluacionService.listarPorModulo(idModulo));
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> eliminar(@PathVariable Long id) {
+        evaluacionService.eliminar(id);
+        return ResponseEntity.noContent().build();
+    }
 }

@@ -51,4 +51,10 @@ public class MaterialClaseController {
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .body(archivo.recurso());
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> eliminar(@PathVariable Long id) {
+        materialService.eliminar(id);
+        return ResponseEntity.noContent().build();
+    }
 }

@@ -60,6 +60,14 @@ public class EvaluacionService {
                 .toList();
     }
 
+    @Transactional
+    public void eliminar(Long idEvaluacion) {
+        if (!evaluacionRepository.existsById(idEvaluacion)) {
+            throw new ResourceNotFoundException("Evaluación no encontrada");
+        }
+        evaluacionRepository.deleteById(idEvaluacion);
+    }
+
     private ModuloCurso resolverModulo(Long idModulo, Seccion seccion) {
         if (idModulo == null) {
             return null;

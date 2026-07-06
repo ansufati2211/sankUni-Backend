@@ -65,6 +65,7 @@ Nota de seguridad: ningún controller usa `@PreAuthorize`/`@Secured`/`@RolesAllo
 | POST | `/` | Crea evaluación (opcionalmente agrupada en un módulo) | Body: `EvaluacionDTO` (seccionId, idModulo opcional, nombreExamen, pesoPorcentaje, fechaExamen) | `EvaluacionDTO` (201) |
 | GET | `/seccion/{id}` | Evaluaciones de una sección | `id` (path) | `List<EvaluacionDTO>` |
 | GET | `/modulo/{idModulo}` | Evaluaciones agrupadas por módulo | `idModulo` (path) | `List<EvaluacionDTO>` |
+| DELETE | `/{id}` | Elimina una evaluación. Falla con 400 si ya tiene notas o entregas registradas (protege esos datos) | `id` (path) | 204 |
 
 ### MaterialClaseController (`/api/v1/materiales`)
 | Método | Ruta | Descripción | Body/Params | Devuelve |
@@ -73,6 +74,7 @@ Nota de seguridad: ningún controller usa `@PreAuthorize`/`@Secured`/`@RolesAllo
 | GET | `/seccion/{idSeccion}` | Materiales de una sección | `idSeccion` (path) | `List<MaterialClaseDTO>` |
 | GET | `/modulo/{idModulo}` | Materiales agrupados por módulo | `idModulo` (path) | `List<MaterialClaseDTO>` |
 | GET | `/{id}/archivo` | Descarga el binario del material vía `StorageService` | `id` (path) | binario |
+| DELETE | `/{id}` | Elimina el material y borra su archivo físico del disco | `id` (path) | 204 |
 
 ### ModuloCurso (`/api/v1/modulos`)
 | Método | Ruta | Descripción | Body/Params | Devuelve |
@@ -80,7 +82,7 @@ Nota de seguridad: ningún controller usa `@PreAuthorize`/`@Secured`/`@RolesAllo
 | POST | `/` | Coordinador crea un módulo (unidad/semana) para un curso | Body: `ModuloCursoDTO` (idCurso, titulo, descripcion, orden) | `ModuloCursoDTO` (201) |
 | GET | `/curso/{idCurso}` | Lista módulos de un curso, ordenados | `idCurso` (path) | `List<ModuloCursoDTO>` |
 | PUT | `/{id}` | Edita título/descripción/orden | `id` (path), Body: `ModuloCursoDTO` | `ModuloCursoDTO` |
-| DELETE | `/{id}` | Elimina un módulo (falla con 400 si tiene material/evaluaciones asociadas, vía integridad de FK) | `id` (path) | 204 |
+| DELETE | `/{id}` | Elimina un módulo. Su material y evaluaciones NO se borran: quedan sin agrupar (`idModulo=null`), conservando archivos, notas y entregas. Por eso nunca falla por tener contenido cargado. | `id` (path) | 204 |
 
 ### EntregaEvaluacion (`/api/v1/entregas`)
 | Método | Ruta | Descripción | Body/Params | Devuelve |
