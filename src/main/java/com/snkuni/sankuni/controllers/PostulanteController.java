@@ -1,4 +1,3 @@
-
 package com.snkuni.sankuni.controllers;
 
 import com.snkuni.sankuni.dtos.PostulanteDTO;
@@ -30,5 +29,11 @@ public class PostulanteController {
     @PostMapping("/{id}/aprobar")
     public ResponseEntity<String> aprobarPostulante(@PathVariable Long id) {
         return ResponseEntity.ok(postulanteService.aprobarPostulante(id));
+    }
+
+    // NUEVO ENDPOINT PARA RECHAZAR POSTULANTE
+    @PostMapping("/{id}/rechazar")
+    public ResponseEntity<String> rechazarPostulante(@PathVariable Long id) {
+        return ResponseEntity.ok(postulanteService.rechazarPostulante(id));
     }
 }

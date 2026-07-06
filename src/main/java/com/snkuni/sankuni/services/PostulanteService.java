@@ -112,6 +112,16 @@ public class PostulanteService {
         return "Aprobado. Credenciales generadas y paquete financiero asignado.";
     }
 
+    // NUEVO MÉTODO PARA RECHAZAR POSTULANTE
+    @Transactional
+    public String rechazarPostulante(Long idPostulante) {
+        Postulante p = postulanteRepository.findById(idPostulante).orElseThrow();
+        p.setEstado(EstadoPostulante.RECHAZADO);
+        postulanteRepository.save(p);
+        
+        return "El postulante ha sido rechazado correctamente.";
+    }
+
     private void enviarCorreoBienvenida(String correoDestino, String nombres, String usuarioLogin, String claveTemporal) {
         try {
             SimpleMailMessage mensaje = new SimpleMailMessage();
