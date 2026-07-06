@@ -19,6 +19,7 @@ public class NotaEvaluacionDTO {
     private Long alumnoId;
     private String nombreAlumno;
     private BigDecimal nota;
+    private String comentario;
     private LocalDateTime fechaRegistro;
 
     // Campos enriquecidos para la vista del alumno

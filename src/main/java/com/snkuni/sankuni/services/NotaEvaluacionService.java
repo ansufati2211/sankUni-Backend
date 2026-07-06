@@ -42,6 +42,7 @@ public class NotaEvaluacionService {
         }
 
         nota.setNota(dto.getNota());
+        nota.setComentario(dto.getComentario());
         nota.setFechaRegistro(LocalDateTime.now());
         
         NotaEvaluacion guardada = notaRepository.save(nota);
@@ -62,6 +63,7 @@ public class NotaEvaluacionService {
                         .alumnoId(n.getAlumno().getIdAlumno())
                         .nombreAlumno(n.getAlumno().getUsuario().getNombreCompleto())
                         .nota(n.getNota())
+                        .comentario(n.getComentario())
                         .fechaRegistro(n.getFechaRegistro())
                         .build())
                 .toList();
@@ -80,6 +82,7 @@ public class NotaEvaluacionService {
                             .evaluacionId(ev != null ? ev.getIdEvaluacion() : null)
                             .alumnoId(n.getAlumno().getIdAlumno())
                             .nota(n.getNota())
+                            .comentario(n.getComentario())
                             .fechaRegistro(n.getFechaRegistro())
                             .nombreExamen(ev != null ? ev.getNombreExamen() : "Sin Nombre")
                             .pesoPorcentaje(ev != null ? ev.getPesoPorcentaje() : 0)

@@ -4,11 +4,10 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
-public class MaterialClaseDTO {
-    private Long idMaterial;
+public class AnuncioSeccionDTO {
+    private Long idAnuncio;
     private Long idSeccion;
-    private Long idModulo;
     private String titulo;
-    private String archivoUrl;
-    private LocalDateTime fechaSubida;
+    private String contenido;
+    private LocalDateTime fechaPublicacion;
 }

@@ -23,6 +23,10 @@ public class Evaluacion {
     @JoinColumn(name = "seccion_id", nullable = false)
     private Seccion seccion;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "modulo_id")
+    private ModuloCurso modulo;
+
     @Column(name = "nombre_examen", nullable = false, length = 100)
     private String nombreExamen;
 

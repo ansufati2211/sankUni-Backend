@@ -26,4 +26,9 @@ public class EvaluacionController {
     public ResponseEntity<List<EvaluacionDTO>> listar(@PathVariable("id") Long id) {
         return ResponseEntity.ok(evaluacionService.listarPorSeccion(id));
     }
+
+    @GetMapping("/modulo/{idModulo}")
+    public ResponseEntity<List<EvaluacionDTO>> listarPorModulo(@PathVariable Long idModulo) {
+        return ResponseEntity.ok(evaluacionService.listarPorModulo(idModulo));
+    }
 }

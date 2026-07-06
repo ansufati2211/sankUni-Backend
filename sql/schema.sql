@@ -256,6 +256,52 @@ CREATE TABLE IF NOT EXISTS mensajes_contacto (
 );
 
 -- =============================================================================
+-- 18. MÓDULOS DE CURSO
+-- Unidades/semanas que el Coordinador define para un curso (compartidas por
+-- todas sus secciones).
+-- =============================================================================
+CREATE TABLE IF NOT EXISTS modulo_curso (
+    id_modulo   BIGSERIAL PRIMARY KEY,
+    curso_id    BIGINT NOT NULL REFERENCES cursos(id_curso),
+    titulo      VARCHAR(150) NOT NULL,
+    descripcion TEXT,
+    orden       INTEGER NOT NULL DEFAULT 0
+);
+
+-- =============================================================================
+-- 19. ENTREGAS DE EVALUACIÓN
+-- Archivo que el alumno sube como entrega de una evaluación.
+-- Constraint único: una sola entrega vigente por alumno y evaluación.
+-- =============================================================================
+CREATE TABLE IF NOT EXISTS entrega_evaluacion (
+    id_entrega     BIGSERIAL PRIMARY KEY,
+    evaluacion_id  BIGINT NOT NULL REFERENCES evaluaciones(id_evaluacion),
+    alumno_id      BIGINT NOT NULL REFERENCES alumnos(id_alumno),
+    archivo_url    TEXT NOT NULL,
+    fecha_entrega  TIMESTAMP DEFAULT NOW(),
+    CONSTRAINT uq_entrega_evaluacion UNIQUE (evaluacion_id, alumno_id)
+);
+
+-- =============================================================================
+-- 20. ANUNCIOS DE SECCIÓN
+-- Comunicados que el docente publica para los alumnos de una sección.
+-- =============================================================================
+CREATE TABLE IF NOT EXISTS anuncio_seccion (
+    id_anuncio        BIGSERIAL PRIMARY KEY,
+    seccion_id        BIGINT NOT NULL REFERENCES secciones(id_seccion),
+    titulo            VARCHAR(150) NOT NULL,
+    contenido         TEXT NOT NULL,
+    fecha_publicacion TIMESTAMP DEFAULT NOW()
+);
+
+-- =============================================================================
+-- ALTERACIONES: agrupación por módulo y feedback de notas
+-- =============================================================================
+ALTER TABLE materiales_clase ADD COLUMN IF NOT EXISTS modulo_id BIGINT REFERENCES modulo_curso(id_modulo);
+ALTER TABLE evaluaciones ADD COLUMN IF NOT EXISTS modulo_id BIGINT REFERENCES modulo_curso(id_modulo);
+ALTER TABLE notas_evaluacion ADD COLUMN IF NOT EXISTS comentario TEXT;
+
+-- =============================================================================
 -- STORED PROCEDURE: sp_registrar_asistencia
 -- Hace UPSERT de asistencia para un alumno en una sección en la fecha actual.
 -- Si ya existe un registro para ese día, lo actualiza; si no, lo inserta.
@@ -288,3 +334,9 @@ CREATE INDEX IF NOT EXISTS idx_asistencia_seccion_f  ON asistencia(seccion_id, f
 CREATE INDEX IF NOT EXISTS idx_cuotas_alumno         ON cuotas_alumno(alumno_id);
 CREATE INDEX IF NOT EXISTS idx_alertas_docente       ON alertas_academicas(docente_id);
 CREATE INDEX IF NOT EXISTS idx_solicitudes_emisor    ON solicitudes(emisor_id);
+CREATE INDEX IF NOT EXISTS idx_modulo_curso_curso    ON modulo_curso(curso_id);
+CREATE INDEX IF NOT EXISTS idx_materiales_modulo     ON materiales_clase(modulo_id);
+CREATE INDEX IF NOT EXISTS idx_evaluaciones_modulo   ON evaluaciones(modulo_id);
+CREATE INDEX IF NOT EXISTS idx_entregas_evaluacion   ON entrega_evaluacion(evaluacion_id);
+CREATE INDEX IF NOT EXISTS idx_entregas_alumno       ON entrega_evaluacion(alumno_id);
+CREATE INDEX IF NOT EXISTS idx_anuncios_seccion      ON anuncio_seccion(seccion_id);

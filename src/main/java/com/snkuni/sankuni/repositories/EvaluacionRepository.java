@@ -8,4 +8,5 @@ import java.util.List;
 @Repository
 public interface EvaluacionRepository extends JpaRepository<Evaluacion, Long> {
     List<Evaluacion> findBySeccion_IdSeccion(Long idSeccion);
+    List<Evaluacion> findByModulo_IdModulo(Long idModulo);
 }

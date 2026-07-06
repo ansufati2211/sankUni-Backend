@@ -6,4 +6,5 @@ import java.util.List;
 
 public interface MaterialClaseRepository extends JpaRepository<MaterialClase, Long> {
     List<MaterialClase> findBySeccion_IdSeccion(Long idSeccion);
+    List<MaterialClase> findByModulo_IdModulo(Long idModulo);
 }

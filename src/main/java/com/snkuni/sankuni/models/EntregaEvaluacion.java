@@ -4,23 +4,21 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-
 @Entity
-@Table(name = "notas_evaluacion", uniqueConstraints = {
+@Table(name = "entrega_evaluacion", uniqueConstraints = {
     @UniqueConstraint(columnNames = {"evaluacion_id", "alumno_id"})
 })
 @Getter @Setter
 @NoArgsConstructor @AllArgsConstructor
 @Builder
-public class NotaEvaluacion {
+public class EntregaEvaluacion {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_nota", updatable = false, nullable = false)
-    private Long idNota;
+    @Column(name = "id_entrega", updatable = false, nullable = false)
+    private Long idEntrega;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "evaluacion_id", nullable = false)
@@ -30,13 +28,10 @@ public class NotaEvaluacion {
     @JoinColumn(name = "alumno_id", nullable = false)
     private Alumno alumno;
 
-    @Column(precision = 4, scale = 2)
-    private BigDecimal nota;
-
-    @Column(columnDefinition = "TEXT")
-    private String comentario;
+    @Column(name = "archivo_url", nullable = false, columnDefinition = "TEXT")
+    private String archivoUrl;
 
     @CreationTimestamp
-    @Column(name = "fecha_registro", updatable = false)
-    private LocalDateTime fechaRegistro;
+    @Column(name = "fecha_entrega", updatable = false)
+    private LocalDateTime fechaEntrega;
 }
