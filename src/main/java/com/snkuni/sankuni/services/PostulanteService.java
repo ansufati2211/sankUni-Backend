@@ -27,7 +27,7 @@ public class PostulanteService {
     private final AlumnoRepository alumnoRepository;
     private final CuotaAlumnoRepository cuotaRepository;
     private final PasswordEncoder passwordEncoder;
-    private final EmailService emailService; // INYECCIÓN ACTUALIZADA
+    private final EmailService emailService; 
     private final SeccionRepository seccionRepository;
     private final MatriculaRepository matriculaRepository;
 
@@ -37,7 +37,7 @@ public class PostulanteService {
                              AlumnoRepository alumnoRepository,
                              CuotaAlumnoRepository cuotaRepository,
                              PasswordEncoder passwordEncoder,
-                             EmailService emailService, // INYECCIÓN ACTUALIZADA
+                             EmailService emailService, 
                              SeccionRepository seccionRepository,
                              MatriculaRepository matriculaRepository) {
         this.postulanteRepository = postulanteRepository;
@@ -46,7 +46,7 @@ public class PostulanteService {
         this.alumnoRepository = alumnoRepository;
         this.cuotaRepository = cuotaRepository;
         this.passwordEncoder = passwordEncoder;
-        this.emailService = emailService; // INYECCIÓN ACTUALIZADA
+        this.emailService = emailService; 
         this.seccionRepository = seccionRepository;
         this.matriculaRepository = matriculaRepository;
     }
@@ -127,7 +127,7 @@ public class PostulanteService {
                 .build());
         cuotaRepository.saveAll(nuevasCuotas);
 
-        // 5. Enviar correo asíncrono (NO BLOQUEA EL SISTEMA)
+        // 5. Enviar correo asíncrono vía API Brevo (NO BLOQUEA EL SISTEMA)
         emailService.enviarCorreoBienvenida(nuevoUsuario.getEmail(), nuevoUsuario.getEmail(), nuevoUsuario.getDni());
 
         return "Aprobado. Credenciales generadas y paquete financiero asignado.";
