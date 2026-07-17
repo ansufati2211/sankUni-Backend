@@ -9,15 +9,30 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 
+// LIBRERÍAS DE SMTP COMENTADAS PARA PRESERVAR FUNCIONALIDAD LOCAL SI SE DESEA
+// import org.springframework.mail.SimpleMailMessage;
+// import org.springframework.mail.javamail.JavaMailSender;
+
 @Service
 public class EmailService {
 
-    // La clave API se inyecta desde Railway, NO SE CAMBIA.
+    // Inyección de la clave API desde application.properties / Variables de Entorno (Railway)
     @Value("${brevo.api.key}")
     private String brevoApiKey;
     
-    // TU NUEVO CORREO OFICIAL (Recuerda que debes haberlo verificado en Brevo)
-    private static final String SENDER_EMAIL = "jhalebet1994@outlook.com"; 
+    // Tu correo de la empresa verificado
+    private static final String SENDER_EMAIL = "jhalebet1994@gmail.com"; 
+
+    /* ==========================================
+     * CONFIGURACIÓN ANTERIOR (SMTP)
+     * Conservada por si se desea regresar al modelo local
+     * ==========================================
+     * private final JavaMailSender mailSender;
+     * 
+     * public EmailService(JavaMailSender mailSender) {
+     *     this.mailSender = mailSender;
+     * }
+     */
 
     @Async
     public void enviarCorreoSeguridad(String destinatario, String codigo) {
@@ -37,8 +52,21 @@ public class EmailService {
                 "}", SENDER_EMAIL, destinatario, codigo);
 
             enviarPeticionBrevo(jsonBody, "Seguridad");
+
+            /* --- CÓDIGO ANTERIOR PARA SMTP LOCAL ---
+            SimpleMailMessage mensaje = new SimpleMailMessage();
+            mensaje.setTo(destinatario);
+            mensaje.setSubject("SANKU - Código de Verificación de Seguridad");
+            mensaje.setText("Hola,\n\n" +
+                    "Se ha solicitado un cambio de contraseña para tu cuenta en el Instituto SANKU.\n" +
+                    "Tu código de verificación de 6 dígitos es: " + codigo + "\n\n" +
+                    "Si no solicitaste este cambio, ignora este correo.\n\n" +
+                    "Atentamente,\nÁrea TI - SANKU.");
+            mailSender.send(mensaje);
+            */
+
         } catch (Exception e) {
-            System.err.println("Error al preparar correo de seguridad: " + e.getMessage());
+            System.out.println("Error al enviar el correo de seguridad: " + e.getMessage());
         }
     }
 
@@ -61,11 +89,27 @@ public class EmailService {
                 "}", SENDER_EMAIL, correoDestino, usuarioLogin, claveTemporal);
 
             enviarPeticionBrevo(jsonBody, "Bienvenida");
+
+            /* --- CÓDIGO ANTERIOR PARA SMTP LOCAL ---
+            SimpleMailMessage mensaje = new SimpleMailMessage();
+            mensaje.setTo(correoDestino);
+            mensaje.setSubject("¡Bienvenido al Instituto Tech! - Credenciales de Acceso");
+            mensaje.setText("Hola,\n\n" +
+                    "¡Felicidades! Tu matrícula ha sido aprobada exitosamente.\n\n" +
+                    "Aquí tienes tus credenciales para acceder a la Intranet de estudiantes:\n" +
+                    "Usuario/Correo: " + usuarioLogin + "\n" +
+                    "Contraseña temporal: " + claveTemporal + "\n\n" +
+                    "Por razones de seguridad, te recomendamos cambiar tu contraseña al ingresar por primera vez.\n\n" +
+                    "Atentamente,\nCoordinación Académica - Instituto Tech");
+            mailSender.send(mensaje);
+            */
+
         } catch (Exception e) {
-            System.err.println("Error al preparar correo de bienvenida: " + e.getMessage());
+            System.out.println("Error al enviar el correo de bienvenida: " + e.getMessage());
         }
     }
 
+    // Método que gestiona la comunicación directa con la API de Brevo
     private void enviarPeticionBrevo(String jsonBody, String tipoCorreo) {
         try {
             HttpRequest request = HttpRequest.newBuilder()
@@ -78,9 +122,9 @@ public class EmailService {
             HttpClient client = HttpClient.newHttpClient();
             HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
             
-            System.out.println("Correo de " + tipoCorreo + " procesado vía API Brevo. Código HTTP: " + response.statusCode());
+            System.out.println("Correo de " + tipoCorreo + " procesado vía API. Código HTTP: " + response.statusCode());
         } catch (Exception e) {
-            System.err.println("Error de conexión con Brevo (" + tipoCorreo + "): " + e.getMessage());
+            System.out.println("Error de conexión con Brevo (" + tipoCorreo + "): " + e.getMessage());
         }
     }
 }
